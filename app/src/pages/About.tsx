@@ -1,0 +1,228 @@
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Instagram } from 'lucide-react';
+import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/shared/AnimatedSection';
+import { useLanguage } from '@/context/LanguageContext';
+
+export function About() {
+  const { t, language } = useLanguage();
+
+
+
+
+
+  return (
+    <div className="bg-cream">
+      {/* Hero Section */}
+      <section className="bg-primary pt-8 lg:pt-12 pb-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-20 lg:-mb-28 translate-y-8"
+          >
+            <img
+              src="/images/about/chocolate-spoon.jpg"
+              alt="Chocolate spoon"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="text-center"
+              >
+                <h1 className="text-white font-serif text-4xl lg:text-6xl tracking-wide">
+                  {t('about.hero')}
+                </h1>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Intro Section */}
+      <section className="pt-56 lg:pt-80 pb-16 lg:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatedSection>
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-6">
+              {t('about.intro.title')}
+            </h2>
+            <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">
+              {t('about.intro.desc')}
+            </p>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Our Story Section */}
+      <section className="py-16 lg:py-24 bg-secondary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <AnimatedSection>
+              <div className="flex justify-center">
+                <img
+                  src="/images/logo.png"
+                  alt="Dr Doudou Bakes logo"
+                  className="w-40 h-40 lg:w-56 lg:h-56 object-contain"
+                />
+              </div>
+            </AnimatedSection>
+            <AnimatedSection delay={0.2}>
+              <h3 className="text-primary font-serif text-2xl lg:text-4xl mb-6">
+                {t('about.story.title')}
+              </h3>
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed mb-4">
+                {t('about.story.p1')}
+              </p>
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed mb-4">
+                {t('about.story.p2')}
+              </p>
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">
+                {t('about.story.p3')}
+              </p>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Quote Section */}
+      <section className="py-16 lg:py-24 bg-accent-green">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatedSection>
+            <blockquote className="text-white font-serif text-2xl lg:text-4xl leading-relaxed mb-8">
+              {t('about.quote.text')}
+            </blockquote>
+            <cite className="text-white/80 text-sm font-medium tracking-wider not-italic">
+              {t('about.quote.author')}
+            </cite>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Creators Section */}
+      <section className="py-16 lg:py-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center mb-16">
+            <span className="font-arabicMain text-4xl lg:text-6xl text-primary block mb-2 opacity-80">
+              {t('about.creators.subtitle')}
+            </span>
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-4">
+              {t('about.creators.title')}
+            </h2>
+            <p className="text-muted-foreground text-base lg:text-lg max-w-2xl mx-auto font-serif italic">
+              {t('about.creators.desc')}
+            </p>
+          </AnimatedSection>
+
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+            {/* Dorra Ben Mahmoud */}
+            <StaggerItem>
+              <div className="text-center group">
+                <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 mx-auto max-w-[320px] shadow-lg border-4 border-white">
+                  <img
+                    src="/images/about/creator.png"
+                    alt="Dorra Ben Mahmoud"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                  />
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+                <h3 className="text-primary font-serif text-2xl lg:text-3xl mb-1">
+                  Dorra Ben Mahmoud
+                </h3>
+                <p className="text-primary/70 font-sans text-sm tracking-[0.2em] font-medium uppercase">
+                  {t('about.creators.ceo')}
+                </p>
+              </div>
+            </StaggerItem>
+
+            {/* Molka Ben Mahmoud */}
+            <StaggerItem>
+              <div className="text-center group">
+                <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 mx-auto max-w-[320px] shadow-lg border-4 border-white">
+                  <img
+                    src="/images/about/creator.png"
+                    alt="Molka Ben Mahmoud"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                  />
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                </div>
+                <h3 className="text-primary font-serif text-2xl lg:text-3xl mb-1">
+                  Molka Ben Mahmoud
+                </h3>
+                <p className="text-primary/70 font-sans text-sm tracking-[0.2em] font-medium uppercase">
+                  {t('about.creators.cofounder')}
+                </p>
+              </div>
+            </StaggerItem>
+          </StaggerContainer>
+        </div>
+      </section>
+      {/* Brands Section */}
+      <section className="py-16 lg:py-24 bg-secondary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatedSection className="mb-16">
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-4">
+              {language === 'FR' ? 'Nos Marques' : 'Our Brands'}
+            </h2>
+          </AnimatedSection>
+
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+            {[
+              { id: 'HAYA', name: 'HAYA', url: 'https://www.instagram.com/haya.medwear/', logo: '/images/brands/haya.jpg', bgColor: '#ebbec1' },
+              { id: 'ScrubzHub', name: 'ScrubzHub', url: 'https://www.instagram.com/scrubzhub/', logo: '/images/brands/scrubzhub.jpg', bgColor: '#fcfbf7' },
+              { id: 'MUGS CORNER', name: 'MUGS CORNER', url: 'https://www.instagram.com/mugs__corner/', logo: '/images/brands/mugs_corner.jpg', bgColor: '#fff6e6' },
+            ].map((brand, index) => (
+              <StaggerItem key={index}>
+                <div className="flex flex-col items-center group cursor-pointer">
+                  <div
+                    className="w-44 h-44 md:w-56 md:h-56 rounded-full overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.12)] border-[6px] border-white/50 backdrop-blur-md transform group-hover:-translate-y-2 transition-all duration-500 flex items-center justify-center mb-8 p-6"
+                    style={{ backgroundColor: brand.bgColor }}
+                  >
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                    />
+                  </div>
+                  <h3 className="font-serif text-2xl text-primary mb-3">
+                    {brand.name}
+                  </h3>
+                  <a
+                    href={brand.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex justify-center items-center text-muted-foreground hover:text-primary transition-colors duration-300"
+                  >
+                    <Instagram className="w-6 h-6" />
+                  </a>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+      {/* CTA Section */}
+      <section className="py-16 lg:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <AnimatedSection>
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-6">
+              {t('about.cta.title')}
+            </h2>
+            <p className="text-muted-foreground text-base lg:text-lg leading-relaxed mb-8">
+              {t('about.cta.desc')}
+            </p>
+            <Link
+              to="/contact"
+              className="inline-block bg-primary text-white rounded-full px-8 py-3 hover:bg-primary-dark transition-colors duration-300"
+            >
+              {t('about.cta.btn')}
+            </Link>
+          </AnimatedSection>
+        </div>
+      </section>
+    </div>
+  );
+}
