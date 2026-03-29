@@ -14,17 +14,17 @@ export function About() {
   return (
     <div className="bg-cream">
       {/* Hero Section */}
-      <section className="bg-primary pt-8 lg:pt-12 pb-0">
+      <section className="bg-primary pt-10 lg:pt-16 pb-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-20 lg:-mb-28 translate-y-8"
+            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
           >
             <img
               src="/images/about/chocolate-spoon.jpg"
-              alt="Chocolate spoon"
+              alt="Artisan chocolate crafting"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -43,11 +43,14 @@ export function About() {
         </div>
       </section>
 
-      {/* Intro Section */}
-      <section className="pt-56 lg:pt-80 pb-16 lg:py-24">
+      {/* Intro Section - Matches Our Desserts Style */}
+      <section className="pt-44 lg:pt-64 pb-16 lg:py-24 bg-[#FEF6ED]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedSection>
-            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-6">
+          <AnimatedSection className="mb-16">
+            <span className="font-arabicMain text-5xl lg:text-7xl text-primary block mb-2 opacity-80">
+              من نحن
+            </span>
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-4">
               {t('about.intro.title')}
             </h2>
             <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">

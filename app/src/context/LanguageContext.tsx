@@ -42,8 +42,8 @@ const translations = {
     'prod.desc': 'From classic favorites to bold innovations, a complete portfolio of premium desserts.',
 
     // Contact form (used on Home and potentially Contact page)
-    'contact.title': 'HOW CAN WE IGNITE GROWTH FOR YOU?',
-    'contact.desc': 'Send us a request to meet and explore whether our insights, expertise, and broad array of premium products can support your strategic initiatives.',
+    'contact.title': 'Get in Touch',
+    'contact.desc': 'Whether you want to place an order, share a memory, or simply say hello — our door is always open.',
     'contact.name': 'Name*',
     'contact.email': 'Email*',
     'contact.company': 'Company',
@@ -52,6 +52,19 @@ const translations = {
     'contact.reason': 'Reason for Contact',
     'contact.message': 'Message',
     'contact.submit': 'SUBMIT',
+
+    'cat.all': 'All',
+    'cat.entremets': 'Entremets',
+    'cat.biscuits': 'Biscuits',
+    'cat.traditional': 'Traditional',
+    'cat.cakes': 'Cakes',
+    'cat.tarts': 'Tarts',
+    'cat.brownies': 'Brownies',
+    'cat.pies': 'Pies',
+
+    'recipes.easy': 'Easy',
+    'recipes.medium': 'Medium',
+    'recipes.hard': 'Hard',
 
     // About Us Page
     'about.hero': 'About Us',
@@ -177,7 +190,20 @@ const translations = {
 
     // Recipe Detail Page
     'recipe.back': 'Retour aux recettes',
-    'recipe.steps': 'Étapes'
+    'recipe.steps': 'Étapes',
+
+    'cat.all': 'Tout',
+    'cat.entremets': 'Entremets',
+    'cat.biscuits': 'Biscuits',
+    'cat.traditional': 'Traditionnel',
+    'cat.cakes': 'Gâteaux',
+    'cat.tarts': 'Tartes',
+    'cat.brownies': 'Brownies',
+    'cat.pies': 'Tartes',
+
+    'recipes.easy': 'Facile',
+    'recipes.medium': 'Moyen',
+    'recipes.hard': 'Difficile'
   }
 };
 

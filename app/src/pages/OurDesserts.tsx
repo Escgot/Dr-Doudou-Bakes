@@ -100,17 +100,17 @@ export function OurDesserts() {
   return (
     <div className="bg-cream">
       {/* Hero Section */}
-      <section className="bg-primary pt-8 lg:pt-12 pb-0">
+      <section className="bg-primary pt-10 lg:pt-16 pb-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-20 lg:-mb-28 translate-y-8"
+            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
           >
             <img
               src="/images/desserts/cheesecake.jpg"
-              alt="Premium cheesecake"
+              alt="Premium cake artisanal"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -130,7 +130,7 @@ export function OurDesserts() {
       </section>
 
       {/* Product Grid - Instagram style gallery */}
-      <section className="pt-40 lg:pt-56 pb-20 lg:pb-28 bg-[#FAF3E8] film-grain warm-filter">
+      <section className="pt-44 lg:pt-64 pb-20 lg:pb-28 bg-[#FEF6ED]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <span className="font-arabicMain text-5xl lg:text-7xl text-primary block mb-2 opacity-80">

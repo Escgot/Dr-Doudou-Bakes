@@ -35,13 +35,13 @@ export function Careers() {
   return (
     <div className="bg-cream">
       {/* Hero Section */}
-      <section className="bg-primary py-8 lg:py-12">
+      <section className="bg-primary pt-8 lg:pt-12 pb-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-2xl overflow-hidden aspect-[16/9] lg:aspect-[21/9]"
+            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-24 lg:-mb-32 translate-y-12 lg:translate-y-20"
           >
             <img
               src="/images/desserts/culinary-artistry.jpg"
@@ -65,10 +65,10 @@ export function Careers() {
       </section>
 
       {/* Intro Section */}
-      <section className="py-16 lg:py-24">
+      <section className="pt-44 lg:pt-64 pb-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
-            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-6">
+            <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-8">
               Join Our Team
             </h2>
             <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">

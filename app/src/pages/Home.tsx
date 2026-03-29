@@ -9,37 +9,57 @@ import { useLanguage } from '@/context/LanguageContext';
 
 // Hero Section
 function HeroSection() {
-  const { t } = useLanguage();
-
   return (
-    <section className="bg-primary pt-8 lg:pt-12 pb-0">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="bg-primary pt-10 lg:pt-16 pb-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-20 lg:-mb-28 translate-y-8"
+          transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative rounded-[2rem] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
+          style={{ aspectRatio: '16 / 9' }}
         >
+          {/* Hero Background Image */}
           <img
             src="/images/desserts/cake-slice.jpg"
-            alt="Premium dessert with chocolate ganache"
-            className="w-full h-full object-cover"
+            alt="Artisan dessert crafting"
+            className="w-full h-full object-cover scale-105"
           />
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/15 flex items-center justify-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="text-center px-6"
             >
-              <img
+              {/* Logo icon */}
+              <motion.img
                 src="/images/logo.png"
                 alt="Dr Doudou Bakes logo"
-                className="w-20 h-20 lg:w-28 lg:h-28 object-contain mx-auto mb-4"
+                className="w-24 h-24 lg:w-48 lg:h-48 object-contain mx-auto mb-2 drop-shadow-lg"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
               />
-              <h1 className="text-white font-brand text-3xl lg:text-5xl tracking-wide">
-                {t('hero.title')}
+
+              {/* Brand Name */}
+              <h1 className="text-white font-brand text-4xl sm:text-5xl lg:text-7xl xl:text-8xl tracking-widest drop-shadow-md uppercase mb-2">
+                Dr Doudou
               </h1>
+
+              {/* Decorative Divider with Sub-text */}
+              <div className="flex items-center justify-center gap-4 lg:gap-6 mt-4">
+                <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
+                <div className="flex items-center">
+                  <span className="text-white font-sans text-xs sm:text-sm lg:text-base tracking-[0.5em] font-bold uppercase whitespace-nowrap">
+                    Bakes
+                  </span>
+                  <span className="text-white/70 text-[10px] lg:text-xs font-sans ml-1 -mt-1">TM</span>
+                </div>
+                <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
+              </div>
             </motion.div>
           </div>
         </motion.div>
@@ -53,7 +73,7 @@ function WelcomeSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="py-16 lg:py-24 bg-cream">
+    <section className="pt-52 lg:pt-80 pb-16 lg:py-24 bg-[#FEF6ED]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <AnimatedSection>
           <p className="text-primary text-xs font-medium tracking-[0.2em] mb-6">
@@ -229,7 +249,7 @@ function ProductCarousel() {
   const products = [
     { image: '/images/desserts/single-serve.jpg', title: 'SINGLE-SERVE', description: 'Our chef-crafted snacks and mini desserts deliver exceptional flavor and shelf appeal in a single-serving size.' },
     { image: '/images/desserts/prepackaged.jpg', title: 'PREPACKAGED', description: 'Retail-ready classic bakery items in convenient packaging, perfectly portioned, and available in a range of sizes.' },
-    { image: '/images/desserts/seasonal-pie.jpg', title: 'SEASONAL & NEW', description: 'Explore desserts with standout appeal that drive relevance all year.' },
+    { image: '/images/desserts/cake-slice.jpg', title: 'SEASONAL & NEW', description: 'Explore desserts with standout appeal that drive relevance all year.' },
     { image: '/images/desserts/premium-cake.jpg', title: 'PREMIUM CAKES', description: 'Visually stunning, scratch-made multi-layer bar cakes, round cakes, molten, and gluten-free cakes crafted to perfection.' },
     { image: '/images/desserts/cheesecake.jpg', title: 'PREMIUM CHEESECAKES', description: 'An impressive assortment of smooth & creamy cheesecakes made with real cream cheese and fresh ingredients.' },
     { image: '/images/desserts/brownies.jpg', title: 'BROWNIES & BARS', description: 'A premium collection of dessert bars and brownies with our signature layering capabilities, ideal for on-the-go formats.' },
@@ -414,10 +434,9 @@ export function Home() {
   return (
     <div className="bg-cream">
       <HeroSection />
-      <div className="h-20 lg:h-32" />
       <WelcomeSection />
       <TwoColumnSection
-        imageSrc="/images/desserts/cake-slice.jpg"
+        imageSrc="/images/desserts/cocoa-powder.jpg"
         imageAlt="Layered cake slice"
         imagePosition="right"
         title={t('col1.title')}
