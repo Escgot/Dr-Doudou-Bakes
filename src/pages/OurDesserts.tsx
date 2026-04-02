@@ -18,7 +18,7 @@ export function OurDesserts() {
       description: t('prod.p2.desc'),
     },
     {
-      image: '/images/desserts/seasonal-pie.jpg',
+      image: '/images/desserts/gateau courant noisettes chocolat.jpg',
       title: t('prod.p3.title'),
       description: t('prod.p3.desc'),
     },
