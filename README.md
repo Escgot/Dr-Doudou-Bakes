@@ -99,4 +99,4 @@ For inquiries regarding **Retail** or **Foodservice** partnerships, please visit
 
 ---
 
-Developed with ❤️ by the Dr Doudou Bakes Team.
+Developed for Dr Doudou Bakes.
