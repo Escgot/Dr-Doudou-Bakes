@@ -431,9 +431,9 @@ export function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex">
+    <div className="min-h-screen bg-[#1a1a2e] flex flex-col lg:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#16213e] border-r border-white/5 flex flex-col min-h-screen sticky top-0">
+      <aside className="w-full lg:w-64 bg-[#16213e] border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col lg:min-h-screen sticky top-0 z-30">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -445,12 +445,12 @@ export function Admin() {
             </div>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="p-4 flex flex-row overflow-x-auto lg:flex-col gap-2 lg:gap-1 custom-scrollbar lg:flex-1">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`flex-shrink-0 lg:w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.key
                   ? 'bg-gradient-to-r from-amber-500/20 to-orange-600/20 text-amber-400 border border-amber-500/20'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
@@ -474,25 +474,26 @@ export function Admin() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 lg:p-8 w-full overflow-hidden">
         <div className="max-w-6xl mx-auto">
           {/* ── Products Tab ───────────────────────────────────────── */}
           {activeTab === 'products' && (
             <>
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                 <div>
-                  <h1 className="text-white font-serif text-3xl">Products</h1>
+                  <h1 className="text-white font-serif text-2xl sm:text-3xl">Products</h1>
                   <p className="text-gray-400 text-sm mt-1">Manage your dessert catalog</p>
                 </div>
                 <button
                   onClick={() => { setEditingProduct(undefined); setModalOpen(true); }}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
                 >
                   <Plus className="w-4 h-4" /> Add Product
                 </button>
               </div>
               <div className="bg-[#16213e] rounded-2xl border border-white/5 overflow-hidden">
-                <table className="w-full">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full min-w-[800px]">
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Product</th>
@@ -550,7 +551,8 @@ export function Admin() {
                       );
                     })}
                   </tbody>
-                </table>
+                  </table>
+                </div>
                 {products.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
                     <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -574,20 +576,21 @@ export function Admin() {
           {/* ── Recipes Tab ────────────────────────────────────────── */}
           {activeTab === 'recipes' && (
             <>
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                 <div>
-                  <h1 className="text-white font-serif text-3xl">Recipes</h1>
+                  <h1 className="text-white font-serif text-2xl sm:text-3xl">Recipes</h1>
                   <p className="text-gray-400 text-sm mt-1">Manage your recipe collection</p>
                 </div>
                 <button
                   onClick={() => { setEditingRecipe(undefined); setModalOpen(true); }}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
                 >
                   <Plus className="w-4 h-4" /> Add Recipe
                 </button>
               </div>
               <div className="bg-[#16213e] rounded-2xl border border-white/5 overflow-hidden">
-                <table className="w-full">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full min-w-[600px]">
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Recipe</th>
@@ -629,7 +632,8 @@ export function Admin() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
                 {recipes.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
                     <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -656,25 +660,27 @@ export function Admin() {
           {activeTab === 'categories' && (
             <>
               <div className="mb-8">
-                <h1 className="text-white font-serif text-3xl">Categories</h1>
+                <h1 className="text-white font-serif text-2xl sm:text-3xl">Categories</h1>
                 <p className="text-gray-400 text-sm mt-1">Organize your products into categories</p>
               </div>
-              <div className="bg-[#16213e] rounded-2xl border border-white/5 p-6">
-                <form onSubmit={handleAddCategory} className="flex gap-3 mb-6">
+              <div className="bg-[#16213e] rounded-2xl border border-white/5 p-4 sm:p-6 overflow-hidden">
+                <form onSubmit={handleAddCategory} className="flex flex-col sm:flex-row gap-3 mb-6">
                   <input
                     value={newCatName}
                     onChange={e => setNewCatName(e.target.value)}
                     placeholder="Category name..."
                     className="flex-1 px-4 py-3 bg-[#0f3460] border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-sm"
                   />
-                  <button type="submit" className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all">
-                    <Plus className="w-4 h-4" /> {editingCategory ? 'Update' : 'Add'}
-                  </button>
-                  {editingCategory && (
-                    <button type="button" onClick={() => { setEditingCategory(undefined); setNewCatName(''); }} className="px-4 py-3 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-colors text-sm">
-                      Cancel
+                  <div className="flex gap-2">
+                    <button type="submit" className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all">
+                      <Plus className="w-4 h-4" /> {editingCategory ? 'Update' : 'Add'}
                     </button>
-                  )}
+                    {editingCategory && (
+                      <button type="button" onClick={() => { setEditingCategory(undefined); setNewCatName(''); }} className="flex-1 sm:flex-none px-4 py-3 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-colors text-sm">
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </form>
                 <div className="space-y-2">
                   {categories.map(cat => (
@@ -704,31 +710,35 @@ export function Admin() {
           {activeTab === 'badges' && (
             <>
               <div className="mb-8">
-                <h1 className="text-white font-serif text-3xl">Badges</h1>
+                <h1 className="text-white font-serif text-2xl sm:text-3xl">Badges</h1>
                 <p className="text-gray-400 text-sm mt-1">Create labels to highlight product features</p>
               </div>
-              <div className="bg-[#16213e] rounded-2xl border border-white/5 p-6">
-                <form onSubmit={handleAddBadge} className="flex gap-3 mb-6">
-                  <input
-                    value={newBadgeLabel}
-                    onChange={e => setNewBadgeLabel(e.target.value)}
-                    placeholder="Badge label..."
-                    className="flex-1 px-4 py-3 bg-[#0f3460] border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-sm"
-                  />
-                  <input
-                    type="color"
-                    value={newBadgeColor}
-                    onChange={e => setNewBadgeColor(e.target.value)}
-                    className="w-12 h-12 rounded-xl border border-white/10 bg-transparent cursor-pointer"
-                  />
-                  <button type="submit" className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all">
-                    <Plus className="w-4 h-4" /> {editingBadge ? 'Update' : 'Add'}
-                  </button>
-                  {editingBadge && (
-                    <button type="button" onClick={() => { setEditingBadge(undefined); setNewBadgeLabel(''); setNewBadgeColor('#D4A574'); }} className="px-4 py-3 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-colors text-sm">
-                      Cancel
+              <div className="bg-[#16213e] rounded-2xl border border-white/5 p-4 sm:p-6 overflow-hidden">
+                <form onSubmit={handleAddBadge} className="flex flex-col sm:flex-row gap-3 mb-6">
+                  <div className="flex gap-2 flex-1">
+                    <input
+                      value={newBadgeLabel}
+                      onChange={e => setNewBadgeLabel(e.target.value)}
+                      placeholder="Badge label..."
+                      className="flex-1 px-4 py-3 bg-[#0f3460] border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 text-sm w-full"
+                    />
+                    <input
+                      type="color"
+                      value={newBadgeColor}
+                      onChange={e => setNewBadgeColor(e.target.value)}
+                      className="w-12 h-12 rounded-xl border border-white/10 bg-transparent cursor-pointer flex-shrink-0"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="submit" className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-5 py-3 rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-700 transition-all">
+                      <Plus className="w-4 h-4" /> {editingBadge ? 'Update' : 'Add'}
                     </button>
-                  )}
+                    {editingBadge && (
+                      <button type="button" onClick={() => { setEditingBadge(undefined); setNewBadgeLabel(''); setNewBadgeColor('#D4A574'); }} className="flex-1 sm:flex-none px-4 py-3 bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-colors text-sm">
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </form>
                 <div className="flex flex-wrap gap-3">
                   {badges.map(badge => (
@@ -752,12 +762,13 @@ export function Admin() {
           {activeTab === 'orders' && (
             <>
               <div className="mb-8">
-                <h1 className="text-white font-serif text-3xl">Orders</h1>
+                <h1 className="text-white font-serif text-2xl sm:text-3xl">Orders</h1>
                 <p className="text-gray-400 text-sm mt-1">View and manage customer orders</p>
               </div>
               <div className="bg-[#16213e] rounded-2xl border border-white/5 overflow-hidden">
                 {orders.length > 0 ? (
-                  <table className="w-full">
+                  <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[1000px]">
                     <thead>
                       <tr className="border-b border-white/5">
                         <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Order ID</th>
@@ -812,13 +823,14 @@ export function Admin() {
                             <div className="flex items-center justify-end gap-1">
                               <button onClick={() => { if (confirm('Delete this order?')) deleteOrder(order.id); }} className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5" title="Delete Order">
                                 <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <div className="text-center py-16 text-gray-500">
                     <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
