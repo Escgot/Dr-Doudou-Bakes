@@ -45,7 +45,7 @@ export function Shop() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
+            className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
           >
             <img
               src="/images/desserts/tart.png"
@@ -59,10 +59,10 @@ export function Shop() {
                 transition={{ delay: 0.5, duration: 0.6 }}
                 className="text-center px-4"
               >
-                <h1 className="text-white font-serif text-4xl lg:text-6xl tracking-wide drop-shadow-md">
+                <h1 className="text-white font-serif text-3xl sm:text-4xl lg:text-6xl tracking-wide drop-shadow-md">
                   Shop Online
                 </h1>
-                <p className="text-white/90 mt-4 text-lg lg:text-xl max-w-2xl mx-auto font-light drop-shadow-sm">
+                <p className="text-white/90 mt-2 sm:mt-4 text-sm sm:text-lg lg:text-xl max-w-2xl mx-auto font-light drop-shadow-sm">
                   Order your favorite Dr Doudou Bakes treats for local delivery.
                 </p>
               </motion.div>
@@ -72,17 +72,17 @@ export function Shop() {
       </section>
 
       {/* Categories & Products */}
-      <section className="bg-[#FEF6ED] pt-44 lg:pt-64 pb-16 lg:py-24 min-h-screen">
+      <section className="bg-[#FEF6ED] pt-32 sm:pt-44 lg:pt-64 pb-16 lg:py-24 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Categories Navigation */}
           <AnimatedSection className="mb-12">
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
               {categories.map(category => (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  className={`px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 ${
                     activeCategory === category.id
                       ? 'bg-pink text-white shadow-lg scale-105'
                       : 'bg-white text-primary border border-pink/20 hover:border-pink hover:bg-pink/5'

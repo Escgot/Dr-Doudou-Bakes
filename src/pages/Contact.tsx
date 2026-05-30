@@ -15,7 +15,7 @@ export function Contact() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
+            className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
           >
             <img
               src="/images/desserts/chocolate-mixing.jpg"
@@ -29,7 +29,7 @@ export function Contact() {
                 transition={{ delay: 0.5, duration: 0.6 }}
                 className="text-center"
               >
-                <h1 className="text-white font-serif text-4xl lg:text-6xl tracking-wide">
+                <h1 className="text-white font-serif text-3xl sm:text-4xl lg:text-6xl tracking-wide">
                   {t('nav.contact')}
                 </h1>
               </motion.div>
@@ -41,7 +41,7 @@ export function Contact() {
       {/* Main Content Area - Seamless Cinematic Background */}
       <div className="bg-[#FEF6ED]">
         {/* Contact Form & Info Section */}
-        <section className="pt-44 lg:pt-64 pb-16 lg:pb-24">
+        <section className="pt-32 sm:pt-44 lg:pt-64 pb-16 lg:pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 

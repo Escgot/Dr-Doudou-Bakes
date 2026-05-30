@@ -106,7 +106,7 @@ export function OurDesserts() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
+            className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
           >
             <img
               src="/images/desserts/cheesecake.jpg"
@@ -120,7 +120,7 @@ export function OurDesserts() {
                 transition={{ delay: 0.5, duration: 0.6 }}
                 className="text-center"
               >
-                <h1 className="text-white font-serif text-4xl lg:text-6xl tracking-wide">
+                <h1 className="text-white font-serif text-3xl sm:text-4xl lg:text-6xl tracking-wide">
                   {t('desserts.hero')}
                 </h1>
               </motion.div>
@@ -130,7 +130,7 @@ export function OurDesserts() {
       </section>
 
       {/* Product Grid - Instagram style gallery */}
-      <section className="pt-44 lg:pt-64 pb-20 lg:pb-28 bg-secondary">
+      <section className="pt-32 sm:pt-44 lg:pt-64 pb-20 lg:pb-28 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <span className="font-arabicMain text-5xl lg:text-7xl text-primary block mb-2 opacity-80">

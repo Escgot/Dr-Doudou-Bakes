@@ -55,7 +55,7 @@ export function Foodservice() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-24 lg:-mb-32 translate-y-12 lg:translate-y-20"
+            className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-2xl z-20 -mb-20 sm:-mb-24 lg:-mb-32 translate-y-10 sm:translate-y-12 lg:translate-y-20"
           >
             <img
               src="/images/desserts/premium-cake.jpg"
@@ -69,7 +69,7 @@ export function Foodservice() {
                 transition={{ delay: 0.5, duration: 0.6 }}
                 className="text-center"
               >
-                <h1 className="text-white font-serif text-4xl lg:text-6xl tracking-wide">
+                <h1 className="text-white font-serif text-3xl sm:text-4xl lg:text-6xl tracking-wide">
                   Foodservice
                 </h1>
               </motion.div>
@@ -79,7 +79,7 @@ export function Foodservice() {
       </section>
 
       {/* Intro Section */}
-      <section className="pt-44 lg:pt-64 pb-16 lg:py-24">
+      <section className="pt-32 sm:pt-44 lg:pt-64 pb-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
             <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-8">

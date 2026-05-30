@@ -54,15 +54,15 @@ function HeroSection() {
               </h1>
 
               {/* Decorative Divider with Sub-text */}
-              <div className="flex items-center justify-center gap-4 lg:gap-6 mt-4 mb-10">
-                <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
+              <div className="flex items-center justify-center gap-2 sm:gap-4 lg:gap-6 mt-2 sm:mt-4 mb-6 sm:mb-10">
+                <span className="block w-10 sm:w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
                 <div className="flex items-center">
-                  <span className="text-white font-sans text-xs sm:text-sm lg:text-base tracking-[0.5em] font-bold uppercase whitespace-nowrap">
+                  <span className="text-white font-sans text-xs sm:text-sm lg:text-base tracking-[0.2em] sm:tracking-[0.5em] font-bold uppercase whitespace-nowrap">
                     Bakes
                   </span>
                   <span className="text-white/70 text-[10px] lg:text-xs font-sans ml-1 -mt-1">TM</span>
                 </div>
-                <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
+                <span className="block w-10 sm:w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
               </div>
             </motion.div>
 
@@ -71,19 +71,19 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
-              className="flex flex-col sm:flex-row gap-4 items-center justify-center px-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center px-4 w-full"
             >
               <button
                 onClick={() => navigate('/our-desserts')}
-                className="bg-white text-primary px-8 py-4 rounded-full font-bold tracking-widest hover:bg-cream hover:scale-105 transition-all duration-300 uppercase shadow-lg text-sm sm:text-base w-full sm:w-auto"
+                className="bg-white text-primary px-8 py-3 sm:py-4 rounded-full font-bold tracking-widest hover:bg-cream hover:scale-105 transition-all duration-300 uppercase shadow-lg text-xs sm:text-sm w-full sm:w-auto"
               >
                 View Desserts
               </button>
               <button
                 onClick={() => navigate('/shop')}
-                className="bg-pink text-white px-8 py-4 rounded-full font-bold tracking-widest hover:bg-pink-dark hover:scale-105 transition-all duration-300 uppercase shadow-lg text-sm sm:text-base flex items-center justify-center gap-2 w-full sm:w-auto border border-pink-light"
+                className="bg-pink text-white px-8 py-3 sm:py-4 rounded-full font-bold tracking-widest hover:bg-pink-dark hover:scale-105 transition-all duration-300 uppercase shadow-lg text-xs sm:text-sm flex items-center justify-center gap-2 w-full sm:w-auto border border-pink-light"
               >
-                <ShoppingBag className="w-5 h-5" /> Order Delivery Now
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" /> Order Delivery Now
               </button>
             </motion.div>
           </div>

@@ -47,22 +47,22 @@ export function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-primary/95 backdrop-blur-sm shadow-lg' : 'bg-primary'
         } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Logo Section */}
-        <div className="flex justify-center py-6">
-          <Link to="/" className="flex items-center gap-4 lg:gap-6 group">
-            <span className="text-white font-brand text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
+        <div className="flex justify-center py-3 lg:py-6">
+          <Link to="/" className="flex items-center gap-2 sm:gap-4 lg:gap-6 group">
+            <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
               Dr Doudou
             </span>
             <div className="relative">
               <img
                 src="/images/logo.webp"
                 alt="Dr Doudou Bakes logo"
-                className="w-10 h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
+                className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute -inset-2 bg-white/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-white font-brand text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
+            <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
               Bakes
             </span>
           </Link>
@@ -107,21 +107,21 @@ export function Header() {
             </div>
           </div>
 
-          <div className="lg:hidden flex justify-end py-3 items-center gap-4">
+          <div className="lg:hidden absolute top-0 right-4 h-full flex items-center justify-end gap-1 sm:gap-4">
             <button
               onClick={toggleCart}
-              className="relative text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="relative text-white p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors"
             >
-              <ShoppingBag className="w-6 h-6" />
+              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 w-5 h-5 bg-amber-500 text-white text-xs font-bold flex items-center justify-center rounded-full">
+                <span className="absolute top-0 right-0 w-4 h-4 sm:w-5 sm:h-5 bg-amber-500 text-white text-[10px] sm:text-xs font-bold flex items-center justify-center rounded-full">
                   {cartCount}
                 </span>
               )}
             </button>
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <button className="text-white p-2">
+                <button className="text-white p-1.5 sm:p-2">
                   <Menu className="w-6 h-6" />
                 </button>
               </SheetTrigger>
