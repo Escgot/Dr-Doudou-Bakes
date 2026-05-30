@@ -47,9 +47,12 @@ export function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-primary/95 backdrop-blur-sm shadow-lg' : 'bg-primary'
         } ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Logo Section */}
-        <div className="flex justify-center py-2 sm:py-3 lg:py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Logo + Mobile Icons Row */}
+        <div className="flex items-center justify-between lg:justify-center py-2 sm:py-3 lg:py-6">
+          {/* Spacer for mobile centering */}
+          <div className="w-16 lg:hidden" />
+
           <Link to="/" className="flex items-center gap-2 sm:gap-4 lg:gap-6 group">
             <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
               Dr Doudou
@@ -66,48 +69,9 @@ export function Header() {
               Bakes
             </span>
           </Link>
-        </div>
 
-        {/* Navigation */}
-        <nav className="lg:border-t lg:border-white/20 relative">
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center py-4 relative">
-            <ul className="flex justify-center items-center gap-8">
-              {navItems.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    to={item.href}
-                    className={`text-white text-xs font-medium tracking-widest hover:opacity-80 transition-opacity duration-200 ${location.pathname === item.href ? 'opacity-100' : 'opacity-90'
-                      }`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            
-            <div className="absolute right-0 flex items-center gap-4">
-              <button
-                onClick={toggleCart}
-                className="relative text-white p-2 hover:bg-white/10 rounded-full transition-colors"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-pink text-white text-[10px] font-bold flex items-center justify-center rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => toggleLanguage()}
-                className="text-primary bg-cream text-xs font-bold tracking-widest px-4 py-1.5 rounded-full hover:bg-cream-dark transition-colors duration-200 uppercase"
-              >
-                {language} 🌐
-              </button>
-            </div>
-          </div>
-
-          <div className="lg:hidden absolute top-0 right-4 h-full flex items-center justify-end gap-1 sm:gap-4">
+          {/* Mobile Cart + Menu */}
+          <div className="lg:hidden flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleCart}
               className="relative text-white p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -146,6 +110,45 @@ export function Header() {
                 </div>
               </SheetContent>
             </Sheet>
+          </div>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:block border-t border-white/20">
+          <div className="flex items-center justify-center py-4 relative">
+            <ul className="flex justify-center items-center gap-8">
+              {navItems.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className={`text-white text-xs font-medium tracking-widest hover:opacity-80 transition-opacity duration-200 ${location.pathname === item.href ? 'opacity-100' : 'opacity-90'
+                      }`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="absolute right-0 flex items-center gap-4">
+              <button
+                onClick={toggleCart}
+                className="relative text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-pink text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => toggleLanguage()}
+                className="text-primary bg-cream text-xs font-bold tracking-widest px-4 py-1.5 rounded-full hover:bg-cream-dark transition-colors duration-200 uppercase"
+              >
+                {language} 🌐
+              </button>
+            </div>
           </div>
         </nav>
       </div>
