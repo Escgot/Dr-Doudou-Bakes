@@ -59,7 +59,7 @@ export function Contact() {
 
                 <div className="space-y-8">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <MapPin className="w-6 h-6 text-primary" />
                     </div>
                     <div>
@@ -74,7 +74,7 @@ export function Contact() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Phone className="w-6 h-6 text-primary" />
                     </div>
                     <div>
@@ -88,7 +88,7 @@ export function Contact() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Mail className="w-6 h-6 text-primary" />
                     </div>
                     <div>
@@ -102,7 +102,7 @@ export function Contact() {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <Instagram className="w-6 h-6 text-primary" />
                     </div>
                     <div>
@@ -193,7 +193,7 @@ export function Contact() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-6xl mx-auto">
               <AnimatedSection>
-                <div className="relative rounded-[2rem] overflow-hidden aspect-square md:aspect-[4/3] bg-primary/10 shadow-sm border border-black/5">
+                <div className="relative rounded-[2rem] overflow-hidden aspect-square md:aspect-[4/3] bg-pink/10 shadow-sm border border-black/5">
                   <img
                     src="/images/contact/headquarters.png"
                     alt="Headquarters Map"
@@ -205,7 +205,7 @@ export function Contact() {
               <AnimatedSection delay={0.2} className="flex flex-col justify-center">
                 <div className="mb-8">
                   <img
-                    src="/images/contact/logo.png"
+                    src="/images/Logo.webp"
                     alt="Logo"
                     className="w-24 h-24 lg:w-28 lg:h-28 object-contain drop-shadow-sm"
                   />

@@ -2,18 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface RecipeDetailContent {
-  title: string;
-  quote: string;
-  ingredientGroups: {
-    title: string;
-    items: string[];
-  }[];
-  steps: string[];
-}
-
-const RECIPE_DETAILS: Record<string, { EN: RecipeDetailContent; FR: RecipeDetailContent; AR: RecipeDetailContent }> = {
+import { useRecipes } from '@/context/RecipeContext';
   'honey-cake': {
     EN: {
       title: 'Heritage Hazelnut & Chocolate Entremets',
@@ -535,9 +524,12 @@ const RECIPE_DETAILS: Record<string, { EN: RecipeDetailContent; FR: RecipeDetail
 export function RecipeDetail() {
   const { id } = useParams();
   const { t, language } = useLanguage();
+  const { recipes } = useRecipes();
   
-  const recipeData = RECIPE_DETAILS[id || ''] || RECIPE_DETAILS['honey-cake'];
-  const recipe = recipeData[language];
+  const recipeData = recipes.find(r => r.id === id) || recipes[0];
+  if (!recipeData) return <div className="min-h-screen bg-cream pt-24 pb-20 text-center">Recipe not found</div>;
+
+  const recipe = recipeData.translations[language];
 
   return (
     <div className="min-h-screen bg-cream pt-24 pb-20 font-sans text-primary">
@@ -572,13 +564,13 @@ export function RecipeDetail() {
             {recipe.ingredientGroups.map((group, groupIndex) => (
               <div key={groupIndex} className="bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-primary/5 shadow-sm">
                 <h3 className="font-serif text-2xl text-primary mb-6 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">✦</span>
+                  <span className="w-8 h-8 rounded-full bg-pink/10 flex items-center justify-center text-sm">✦</span>
                   {group.title}
                 </h3>
                 <ul className="grid grid-cols-1 gap-4">
                   {group.items.map((item, itemIndex) => (
                     <li key={itemIndex} className="flex items-center gap-4 text-primary/90 text-lg border-b border-primary/5 pb-3 last:border-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-pink/40 shrink-0" />
                       {item}
                     </li>
                   ))}
@@ -594,7 +586,7 @@ export function RecipeDetail() {
             <div className="space-y-12">
               {recipe.steps.map((step, index) => (
                 <div key={index} className="flex items-start gap-8 group">
-                  <div className="shrink-0 w-12 h-12 rounded-full bg-primary text-white font-serif text-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-pink text-white font-serif text-xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
                     {index + 1}
                   </div>
                   <div className="pt-2">

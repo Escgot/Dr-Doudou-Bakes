@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, ShoppingBag } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-
-
 import { useLanguage } from '@/context/LanguageContext';
+import { useCart } from '@/context/CartContext';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,13 +12,15 @@ export function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
+  const { cartCount, toggleCart } = useCart();
   const location = useLocation();
 
   const navItems = [
-    { label: t('nav.desserts'), href: '/our-desserts' },
-    { label: t('nav.recipes'), href: '/recipes' },
-    { label: t('nav.about'), href: '/about' },
-    { label: t('nav.contact'), href: '/contact' },
+    { href: '/our-desserts', label: t('nav.desserts') },
+    { href: '/shop', label: t('nav.shop') },
+    { href: '/recipes', label: t('nav.recipes') },
+    { href: '/about', label: t('nav.about') },
+    { href: '/contact', label: t('nav.contact') },
   ];
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export function Header() {
             </span>
             <div className="relative">
               <img
-                src="/images/logo.png"
+                src="/images/Logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-10 h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
               />
@@ -84,16 +85,40 @@ export function Header() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => toggleLanguage()}
-              className="absolute right-0 text-primary bg-cream text-xs font-bold tracking-widest px-4 py-1.5 rounded-full hover:bg-cream-dark transition-colors duration-200 uppercase"
-            >
-              {language} 🌐
-            </button>
+            
+            <div className="absolute right-0 flex items-center gap-4">
+              <button
+                onClick={toggleCart}
+                className="relative text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-pink text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => toggleLanguage()}
+                className="text-primary bg-cream text-xs font-bold tracking-widest px-4 py-1.5 rounded-full hover:bg-cream-dark transition-colors duration-200 uppercase"
+              >
+                {language} 🌐
+              </button>
+            </div>
           </div>
 
-          {/* Mobile Navigation */}
-          <div className="lg:hidden flex justify-end py-3">
+          <div className="lg:hidden flex justify-end py-3 items-center gap-4">
+            <button
+              onClick={toggleCart}
+              className="relative text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <ShoppingBag className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 w-5 h-5 bg-amber-500 text-white text-xs font-bold flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </button>
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <button className="text-white p-2">

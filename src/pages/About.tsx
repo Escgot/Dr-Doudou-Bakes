@@ -44,7 +44,7 @@ export function About() {
       </section>
 
       {/* Intro Section - Matches Our Desserts Style */}
-      <section className="pt-44 lg:pt-64 pb-16 lg:py-24 bg-[#FEF6ED]">
+      <section className="pt-44 lg:pt-64 pb-16 lg:py-24 bg-secondary">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection className="mb-16">
             <span className="font-arabicMain text-5xl lg:text-7xl text-primary block mb-2 opacity-80">
@@ -67,7 +67,7 @@ export function About() {
             <AnimatedSection>
               <div className="flex justify-center">
                 <img
-                  src="/images/logo.png"
+                  src="/images/Logo.webp"
                   alt="Dr Doudou Bakes logo"
                   className="w-40 h-40 lg:w-56 lg:h-56 object-contain"
                 />
@@ -92,7 +92,7 @@ export function About() {
       </section>
 
       {/* Quote Section */}
-      <section className="py-16 lg:py-24 bg-accent-green">
+      <section className="py-16 lg:py-24 bg-pink">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
             <blockquote className="text-white font-serif text-2xl lg:text-4xl leading-relaxed mb-8">
@@ -120,42 +120,28 @@ export function About() {
             </p>
           </AnimatedSection>
 
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+          <StaggerContainer className="flex flex-col md:flex-row justify-center items-center gap-8 lg:gap-16 max-w-4xl mx-auto">
             {/* Dorra Ben Mahmoud */}
-            <StaggerItem>
-              <div className="text-center group">
-                <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 mx-auto max-w-[320px] shadow-lg border-4 border-white">
-                  <img
-                    src="/images/about/creator.png"
-                    alt="Dorra Ben Mahmoud"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-                  />
-                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-                <h3 className="text-primary font-serif text-2xl lg:text-3xl mb-1">
+            <StaggerItem className="w-full">
+              <div className="text-center p-10 lg:p-14 bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-pink/10 hover:border-pink/30 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(232,108,139,0.12)] transition-all duration-500">
+                <h3 className="text-primary font-serif text-3xl lg:text-4xl mb-4">
                   Dorra Ben Mahmoud
                 </h3>
-                <p className="text-primary/70 font-sans text-sm tracking-[0.2em] font-medium uppercase">
+                <div className="w-12 h-px bg-pink/40 mx-auto mb-4" />
+                <p className="text-primary/70 font-sans text-sm tracking-[0.25em] font-medium uppercase">
                   {t('about.creators.ceo')}
                 </p>
               </div>
             </StaggerItem>
 
             {/* Molka Ben Mahmoud */}
-            <StaggerItem>
-              <div className="text-center group">
-                <div className="relative overflow-hidden rounded-[2rem] aspect-[3/4] mb-6 mx-auto max-w-[320px] shadow-lg border-4 border-white">
-                  <img
-                    src="/images/about/creator.png"
-                    alt="Molka Ben Mahmoud"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-                  />
-                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                </div>
-                <h3 className="text-primary font-serif text-2xl lg:text-3xl mb-1">
+            <StaggerItem className="w-full">
+              <div className="text-center p-10 lg:p-14 bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-pink/10 hover:border-pink/30 hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(232,108,139,0.12)] transition-all duration-500">
+                <h3 className="text-primary font-serif text-3xl lg:text-4xl mb-4">
                   Molka Ben Mahmoud
                 </h3>
-                <p className="text-primary/70 font-sans text-sm tracking-[0.2em] font-medium uppercase">
+                <div className="w-12 h-px bg-pink/40 mx-auto mb-4" />
+                <p className="text-primary/70 font-sans text-sm tracking-[0.25em] font-medium uppercase">
                   {t('about.creators.cofounder')}
                 </p>
               </div>
@@ -197,7 +183,7 @@ export function About() {
                     href={brand.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex justify-center items-center text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="flex justify-center items-center text-muted-foreground hover:text-pink transition-colors duration-300"
                   >
                     <Instagram className="w-6 h-6" />
                   </a>
@@ -219,7 +205,7 @@ export function About() {
             </p>
             <Link
               to="/contact"
-              className="inline-block bg-primary text-white rounded-full px-8 py-3 hover:bg-primary-dark transition-colors duration-300"
+              className="inline-block bg-pink text-white rounded-full px-8 py-3 hover:bg-pink-dark transition-colors duration-300"
             >
               {t('about.cta.btn')}
             </Link>

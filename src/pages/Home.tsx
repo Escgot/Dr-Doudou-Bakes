@@ -1,14 +1,18 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatedSection } from '@/components/shared/AnimatedSection';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useProducts } from '@/context/ProductContext';
+import { useCart } from '@/context/CartContext';
 
 // Hero Section
 function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="bg-primary pt-10 lg:pt-16 pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,13 +25,13 @@ function HeroSection() {
         >
           {/* Hero Background Image */}
           <img
-            src="/images/desserts/cake-slice.jpg"
+            src="/images/desserts/cake-slice.webp"
             alt="Artisan dessert crafting"
             className="w-full h-full object-cover scale-105"
           />
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/15 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/20 flex flex-col items-center justify-center pt-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -36,7 +40,7 @@ function HeroSection() {
             >
               {/* Logo icon */}
               <motion.img
-                src="/images/logo.png"
+                src="/images/Logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-24 h-24 lg:w-48 lg:h-48 object-contain mx-auto mb-2 drop-shadow-lg"
                 initial={{ opacity: 0, y: -20 }}
@@ -50,7 +54,7 @@ function HeroSection() {
               </h1>
 
               {/* Decorative Divider with Sub-text */}
-              <div className="flex items-center justify-center gap-4 lg:gap-6 mt-4">
+              <div className="flex items-center justify-center gap-4 lg:gap-6 mt-4 mb-10">
                 <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
                 <div className="flex items-center">
                   <span className="text-white font-sans text-xs sm:text-sm lg:text-base tracking-[0.5em] font-bold uppercase whitespace-nowrap">
@@ -60,6 +64,27 @@ function HeroSection() {
                 </div>
                 <span className="block w-24 lg:w-48 h-[2px] bg-white/60 rounded-full" />
               </div>
+            </motion.div>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+              className="flex flex-col sm:flex-row gap-4 items-center justify-center px-4"
+            >
+              <button
+                onClick={() => navigate('/our-desserts')}
+                className="bg-white text-primary px-8 py-4 rounded-full font-bold tracking-widest hover:bg-cream hover:scale-105 transition-all duration-300 uppercase shadow-lg text-sm sm:text-base w-full sm:w-auto"
+              >
+                View Desserts
+              </button>
+              <button
+                onClick={() => navigate('/shop')}
+                className="bg-pink text-white px-8 py-4 rounded-full font-bold tracking-widest hover:bg-pink-dark hover:scale-105 transition-all duration-300 uppercase shadow-lg text-sm sm:text-base flex items-center justify-center gap-2 w-full sm:w-auto border border-pink-light"
+              >
+                <ShoppingBag className="w-5 h-5" /> Order Delivery Now
+              </button>
             </motion.div>
           </div>
         </motion.div>
@@ -73,7 +98,7 @@ function WelcomeSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="pt-52 lg:pt-80 pb-16 lg:py-24 bg-[#FEF6ED]">
+    <section className="pt-52 lg:pt-80 pb-16 lg:py-24 bg-secondary">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <AnimatedSection>
           <p className="text-primary text-xs font-medium tracking-[0.2em] mb-6">
@@ -89,7 +114,7 @@ function WelcomeSection() {
           <div className="mt-8 flex justify-center">
             <svg
               viewBox="0 0 60 40"
-              className="w-16 h-10 fill-primary"
+              className="w-16 h-10 fill-pink"
             >
               <path d="M30 0c-5 0-10 5-10 10 0 3 1.5 5.5 4 7-8 2-14 9-14 17 0 2.5.5 5 1.5 7h37c1-2 1.5-4.5 1.5-7 0-8-6-15-14-17 2.5-1.5 4-4 4-7 0-5-5-10-10-10z" />
             </svg>
@@ -183,7 +208,7 @@ function CapabilitiesSection() {
             <div className="relative flex justify-center">
               <div className="w-64 h-80 lg:w-80 lg:h-96 bg-secondary rounded-full flex items-center justify-center">
                 <img
-                  src="/images/desserts/whisk-cream.png"
+                  src="/images/desserts/whisk-cream.webp"
                   alt="Whisk with cream"
                   className="w-48 h-auto object-contain animate-float"
                 />
@@ -198,7 +223,7 @@ function CapabilitiesSection() {
             </h3>
             <p className="text-muted-foreground text-base lg:text-lg leading-relaxed mb-8">
               {t('cap.desc1')}
-              <Link to="/about" className="text-primary underline hover:no-underline">
+              <Link to="/about" className="text-pink underline hover:no-underline">
                 {t('cap.desc2')}
               </Link>.
             </p>
@@ -206,7 +231,7 @@ function CapabilitiesSection() {
             <Accordion type="single" collapsible className="w-full">
               {capabilities.map((capability, index) => (
                 <AccordionItem key={index} value={`item-${index}`} className="border-b border-primary/20">
-                  <AccordionTrigger className="text-primary text-sm font-medium tracking-wider py-4 hover:no-underline">
+                  <AccordionTrigger className="text-primary text-sm font-medium tracking-wider py-4 hover:no-underline text-left">
                     {capability}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground text-sm pb-4">
@@ -245,15 +270,11 @@ function QuoteSection() {
 // Product Carousel
 function ProductCarousel() {
   const { t } = useLanguage();
+  const { publishedProducts, getBadgesForProduct } = useProducts();
+  const { addToCart, isInCart } = useCart();
 
-  const products = [
-    { image: '/images/desserts/single-serve.jpg', title: t('prod.p1.title'), description: t('prod.p1.desc') },
-    { image: '/images/desserts/prepackaged.jpg', title: t('prod.p2.title'), description: t('prod.p2.desc') },
-    { image: '/images/desserts/cake-slice.jpg', title: t('prod.p3.title'), description: t('prod.p3.desc') },
-    { image: '/images/desserts/premium-cake.jpg', title: t('prod.p4.title'), description: t('prod.p4.desc') },
-    { image: '/images/desserts/cheesecake.jpg', title: t('prod.p5.title'), description: t('prod.p5.desc') },
-    { image: '/images/desserts/brownies.jpg', title: t('prod.p6.title'), description: t('prod.p6.desc') },
-  ];
+  // Get top 6 products
+  const carouselProducts = publishedProducts.slice(0, 6);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -271,7 +292,7 @@ function ProductCarousel() {
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, []);
+  }, [carouselProducts]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -317,41 +338,122 @@ function ProductCarousel() {
           <div
             ref={scrollRef}
             onScroll={checkScroll}
-            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 px-2"
+            className="flex gap-6 overflow-x-auto scrollbar-hide pb-8 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {products.map((product, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="flex-shrink-0 w-80 group"
-              >
-                <div className="relative overflow-hidden rounded-2xl mb-4 aspect-[4/3]">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <h4 className="text-primary font-sans text-sm font-semibold tracking-wider mb-2">
-                  {product.title}
-                </h4>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-3">
-                  {product.description}
-                </p>
-                <Link
-                  to="/our-desserts"
-                  className="text-primary text-sm font-medium underline hover:no-underline"
+            {carouselProducts.map((product, index) => {
+              const badges = getBadgesForProduct(product);
+              const inCart = isInCart(product.id);
+
+              return (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex-shrink-0 w-80 group flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-xl border border-primary/5 transition-all duration-300"
                 >
-                  Explore
-                </Link>
-              </motion.div>
-            ))}
+                  <Link to={`/products/${product.slug}`} className="flex flex-col h-full">
+                    <div className="relative overflow-hidden rounded-t-2xl aspect-[4/3]">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {badges.length > 0 && (
+                        <div className="absolute top-3 left-3">
+                          <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold tracking-wider" style={{ color: badges[0].color }}>
+                            {badges[0].label}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex justify-between items-start mb-2 gap-2">
+                        <h4 className="text-primary font-sans text-sm font-semibold tracking-wider line-clamp-2">
+                          {product.name}
+                        </h4>
+                        <span className="text-primary font-bold whitespace-nowrap text-sm">
+                          {product.price.toFixed(2)} TND
+                        </span>
+                      </div>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-4 flex-1 line-clamp-2">
+                        {product.description}
+                      </p>
+
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addToCart(product);
+                        }}
+                        className={`w-full py-2.5 rounded-xl font-medium tracking-wide flex items-center justify-center gap-2 transition-all duration-300 text-sm ${inCart
+                          ? 'bg-secondary text-primary border border-pink/20 hover:bg-pink hover:text-white'
+                          : 'bg-pink text-white hover:bg-pink-dark'
+                          }`}
+                      >
+                        <ShoppingBag className="w-4 h-4" /> {inCart ? 'Add More' : 'Add to Cart'}
+                      </button>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+// FAQ Section
+function FAQSection() {
+  const faqs = [
+    {
+      q: "How far in advance should I place my order?",
+      a: "We recommend placing your order at least 24 hours in advance. For orders placed before 4:00 PM, we offer next-day delivery (excluding Sundays)."
+    },
+    {
+      q: "Do you offer gluten-free or vegan options?",
+      a: "Absolutely! We believe everyone deserves an extraordinary dessert. We offer several dedicated gluten-free and vegan options. You can easily find them by looking for the green dietary badges on our products in the Shop, or simply select the 'Gluten-Free' category. Our Artisan Chocolate Truffles, for example, have a delicious vegan option!"
+    },
+    {
+      q: "Where do you deliver?",
+      a: "Currently, we offer hand-delivery within the Sfax greater area. We ensure all our desserts arrive in perfect condition using our temperature-controlled vehicles."
+    },
+    {
+      q: "How should I store my desserts?",
+      a: "Most of our cakes and cheesecakes should be kept refrigerated and brought to room temperature 30 minutes before serving. Macarons and brownies can be kept at room temperature in an airtight container for up to 3 days."
+    }
+  ];
+
+  return (
+    <section className="py-16 lg:py-24 bg-secondary">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <AnimatedSection className="text-center mb-12">
+          <h2 className="text-primary font-serif text-3xl lg:text-5xl mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-muted-foreground text-base lg:text-lg">
+            Got questions? We've got answers.
+          </p>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.2}>
+          <Accordion type="single" collapsible className="w-full bg-white rounded-2xl p-6 shadow-sm border border-primary/5">
+            {faqs.map((faq, index) => (
+              <AccordionItem key={index} value={`faq-${index}`} className="border-b border-primary/10 last:border-0">
+                <AccordionTrigger className="text-primary text-base font-medium py-5 hover:no-underline text-left">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </AnimatedSection>
       </div>
     </section>
   );
@@ -415,7 +517,7 @@ function ContactSection() {
               />
               <Button
                 type="submit"
-                className="w-full bg-primary text-white rounded-full py-3 hover:bg-primary-dark transition-colors duration-300"
+                className="w-full bg-pink text-white rounded-full py-3 hover:bg-pink-dark transition-colors duration-300"
               >
                 {t('contact.submit')}
               </Button>
@@ -452,6 +554,7 @@ export function Home() {
       <CapabilitiesSection />
       <QuoteSection />
       <ProductCarousel />
+      <FAQSection />
       <ParallaxImage />
       <ContactSection />
     </div>

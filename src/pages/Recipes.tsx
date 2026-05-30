@@ -3,196 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Search, Clock, ChefHat, Users, Heart } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface RecipeContent {
-  title: string;
-  description: string;
-  category: string;
-  tags: string[];
-}
-
-interface Recipe {
-  id: string;
-  imageUrl: string;
-  prepTime: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  servings: number;
-  translations: {
-    EN: RecipeContent;
-    FR: RecipeContent;
-    AR: RecipeContent;
-  };
-}
-
-const FEATURED_RECIPES: Recipe[] = [
-  {
-    id: 'honey-cake',
-    imageUrl: '/images/desserts/cake-slice.jpg',
-    prepTime: '2h',
-    difficulty: 'Hard',
-    servings: 10,
-    translations: {
-      EN: {
-        title: 'Heritage Hazelnut & Chocolate Entremets',
-        description: 'A luxurious alliance of hazelnut dacquoise, cocoa genoise, and smooth mousseline cream for grand occasions.',
-        category: 'Entremets',
-        tags: ['Chocolate', 'Hazelnut']
-      },
-      FR: {
-        title: 'Entremets Noisette & Chocolat',
-        description: 'Une alliance luxueuse de dacquoise noisette, génoise cacao et crème mousseline onctueuse pour les grandes occasions.',
-        category: 'Entremets',
-        tags: ['Chocolat', 'Noisette']
-      },
-      AR: {
-        title: 'أنطرميه البندق والشوكولاتة التراثي',
-        description: 'تحالف فاخر من داكواز البندق، جينواز الكاكاو، وكريم موسلين ناعم للمناسبات الكبرى.',
-        category: 'Entremets',
-        tags: ['شوكولاتة', 'بندق']
-      }
-    }
-  },
-  {
-    id: 'chocolate-roll',
-    imageUrl: '/images/desserts/russe-pistache.jpg',
-    prepTime: '1h',
-    difficulty: 'Hard',
-    servings: 12,
-    translations: {
-      EN: {
-        title: 'Pistachio Russian Cake',
-        description: 'A revisited classic composed of three layers of pistachio dacquoise and a silky, fragrant mousseline cream.',
-        category: 'Entremets',
-        tags: ['Pistachio', 'Russian']
-      },
-      FR: {
-        title: 'Russe Pistache',
-        description: 'Un classique revisité composé de trois couches de dacquoise pistache et d’une crème mousseline onctueuse et parfumée.',
-        category: 'Entremets',
-        tags: ['Pistache', 'Russe']
-      },
-      AR: {
-        title: 'كيك روسي بالفستق',
-        description: 'كلاسيكي متجدد يتكون من ثلاث طبقات من داكواز الفستق وكريم موسلين حريري وعطر.',
-        category: 'Entremets',
-        tags: ['فستق', 'روسي']
-      }
-    }
-  },
-  {
-    id: 'vanilla-cheesecake',
-    imageUrl: '/images/desserts/cheesecake.jpg',
-    prepTime: '20m',
-    difficulty: 'Easy',
-    servings: 20,
-    translations: {
-      EN: {
-        title: 'Biscuit & Almond Rounds',
-        description: 'Delicious artisanal bites blending crunchy almonds with the sweetness of geranium water and chocolate.',
-        category: 'Traditional',
-        tags: ['Authentic', 'Bites']
-      },
-      FR: {
-        title: 'Boulettes Biscuits & Amandes',
-        description: 'De délicieuses bouchées artisanales mêlant le croquant des amandes à la douceur de l’eau de géranium et du chocolat.',
-        category: 'Traditional',
-        tags: ['Authentique', 'Bouchées']
-      },
-      AR: {
-        title: 'كرات البسكويت واللوز',
-        description: 'لقيمات حرفية لذيذة تمزج بين اللوز المقرمش وحلاوة ماء العطرشية والشوكولاتة.',
-        category: 'Traditional',
-        tags: ['أصيل', 'لقيمات']
-      }
-    }
-  },
-  {
-    id: 'dark-brownie',
-    imageUrl: '/images/desserts/gateau courant noisettes chocolat.jpg',
-    prepTime: '45m',
-    difficulty: 'Medium',
-    servings: 12,
-    translations: {
-      EN: {
-        title: 'No-Bake Hazelnut Chocolate Cake',
-        description: 'A stunning no-bake dessert layering intense chocolate mousse and a smooth hazelnut praline mousseline.',
-        category: 'Traditional',
-        tags: ['Chocolate', 'Hazelnut', 'No-Bake']
-      },
-      FR: {
-        title: "Gâteau courant d'air noisettes chocolat",
-        description: 'Un dessert sans cuisson renversant, superposant une mousse chocolat intense et une mousseline praliné onctueuse.',
-        category: 'Traditional',
-        tags: ['Chocolat', 'Noisette', 'Sans Cuisson']
-      },
-      AR: {
-        title: 'كيك الشوكولاتة والبندق بدون خبز',
-        description: 'تحلية مذهلة بدون خبز بطبقات من موس الشوكولاتة المكثف وموسلين براليني البندق الناعم.',
-        category: 'Traditional',
-        tags: ['شوكولاتة', 'بندق', 'بدون خبز']
-      }
-    }
-  },
-  {
-    id: 'seasonal-berry-pie',
-    imageUrl: '/images/desserts/brownies.jpg',
-    prepTime: '1h',
-    difficulty: 'Hard',
-    servings: 8,
-    translations: {
-      EN: {
-        title: 'Artisanal Shortcrust Base',
-        description: 'A crispy handcrafted base in 5 irresistible flavors: Pistachio, Hazelnut, Kinder, Snickers, and Dubai.',
-        category: 'Biscuits',
-        tags: ['Authentic', 'Zouza']
-      },
-      FR: {
-        title: 'Pâte Sablée',
-        description: 'Une base artisanale croustillante à sabler, déclinée en 5 parfums irrésistibles : Pistache, Noisette, Kinder, Snickers et Dubaï.',
-        category: 'Biscuits',
-        tags: ['Authentique', 'Zouza']
-      },
-      AR: {
-        title: 'عجينة الصابلي الحرفية',
-        description: 'قاعدة مقرمشة مصنوعة يدوياً بخمس نكهات لا تقاوم: فستق، بندق، كيندر، سنيكرز، ودبي.',
-        category: 'Biscuits',
-        tags: ['أصيل', 'زوزة']
-      }
-    }
-  },
-  {
-    id: 'mini-tarts',
-    imageUrl: '/images/desserts/single-serve.jpg',
-    prepTime: '50m',
-    difficulty: 'Medium',
-    servings: 4,
-    translations: {
-      EN: {
-        title: 'Chocolate Brownie',
-        description: 'A rich and fudgy chocolate brownie with artisanal toppings and a perfect crackly top.',
-        category: 'Brownies',
-        tags: ['Chocolate', 'Fudge']
-      },
-      FR: {
-        title: 'Chocolate Brownie',
-        description: 'Brownie au chocolat riche et fondant avec des garnitures artisanales et une croûte parfaitement craquante.',
-        category: 'Brownies',
-        tags: ['Chocolat', 'Fondant']
-      },
-      AR: {
-        title: 'براوني الشوكولاتة',
-        description: 'براوني شوكولاتة غني وطري مع إضافات حرفية وطبقة علوية مقرمشة مثالية.',
-        category: 'Brownies',
-        tags: ['شوكولاتة', 'فدج']
-      }
-    }
-  }
-];
+import { useRecipes } from '@/context/RecipeContext';
 
 const CATEGORIES = ['All', 'Cakes', 'Traditional', 'Cheesecakes', 'Pies', 'Brownies', 'Tarts', 'Biscuits', 'Entremets'];
 
 export function Recipes() {
   const { t, language } = useLanguage();
+  const { recipes } = useRecipes();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -207,7 +24,7 @@ export function Recipes() {
     });
   };
 
-  const filteredRecipes = FEATURED_RECIPES.filter(recipe => {
+  const filteredRecipes = recipes.filter(recipe => {
     const content = recipe.translations[language];
     const matchesSearch = content.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       content.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -274,8 +91,8 @@ export function Recipes() {
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   className={`flex-shrink-0 px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category
-                    ? 'bg-primary text-white shadow-md'
-                    : 'bg-white text-muted-foreground hover:bg-white/60 shadow-sm'
+                    ? 'bg-pink text-white shadow-md'
+                    : 'bg-white text-primary border border-primary/20 hover:border-pink hover:bg-pink/5 shadow-sm'
                     }`}
                 >
                   {category === 'All' ? t('cat.all') : t(`cat.${category.toLowerCase()}`)}

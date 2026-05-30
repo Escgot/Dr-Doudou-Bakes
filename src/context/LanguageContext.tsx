@@ -13,6 +13,7 @@ const translations = {
   EN: {
     // Header & Navigation
     'nav.desserts': 'OUR DESSERTS',
+    'nav.shop': 'SHOP',
     'nav.recipes': 'RECIPES',
     'nav.about': 'ABOUT US',
     'nav.contact': 'CONTACT',
@@ -149,6 +150,7 @@ const translations = {
   FR: {
     // Header & Navigation
     'nav.desserts': 'NOS DESSERTS',
+    'nav.shop': 'BOUTIQUE',
     'nav.recipes': 'RECETTES',
     'nav.about': 'À PROPOS',
     'nav.contact': 'CONTACT',
@@ -177,17 +179,17 @@ const translations = {
     'quote.author': 'SUSANNE ROSS, VICE-PRÉSIDENTE',
     'prod.title': 'COLLECTIONS PREMIUM',
     'prod.desc': 'Des classiques favoris aux innovations audacieuses, un portefeuille complet de desserts.',
-    'prod.p1.title': 'PORTIONS INDIVIDUELLES',
+    'prod.p1.title': 'Chocolate Brownie',
     'prod.p1.desc': 'Nos desserts miniatures offrent une saveur exceptionnelle dans un format pratique.',
-    'prod.p2.title': 'PRÉ-EMBALLÉS',
+    'prod.p2.title': 'Boulettes Biscuits & Amandes',
     'prod.p2.desc': 'Des classiques de boulangerie emballés pour la commodité et la fraîcheur.',
     'prod.p3.title': 'SAISONNIER ET NOUVEAU',
     'prod.p3.desc': 'Découvrez nos créations saisonnières qui captivent toute l\'année.',
     'prod.p4.title': 'GÂTEAUX PREMIUM',
     'prod.p4.desc': 'Gâteaux à étages visuellement époustouflants, préparés de manière artisanale.',
-    'prod.p5.title': 'CHEESECAKES PREMIUM',
+    'prod.p5.title': 'Boulettes Biscuits & Amandes',
     'prod.p5.desc': 'Un assortiment onctueux de cheesecakes faits avec de vrais ingrédients.',
-    'prod.p6.title': 'BROWNIES ET BARRES',
+    'prod.p6.title': 'Pâte Sablée',
     'prod.p6.desc': 'Une collection de barres dessert et brownies signature, parfaits pour emporter.',
 
     // Contact form
@@ -263,7 +265,7 @@ const translations = {
     'cat.brownies': 'Brownies',
     'cat.pies': 'Tartes',
 
-    'desserts.cat.p7.title': 'TARTES PREMIUM',
+    'desserts.cat.p7.title': 'Entremets Noisette & Chocolat',
     'desserts.cat.p7.desc': 'Variétés de tartes classiques et innovantes faites avec des garnitures de qualité supérieure.',
     'desserts.cat.p8.title': 'SANS GLUTEN',
     'desserts.cat.p8.desc': 'Délicieuses options sans gluten qui ne font jamais de compromis sur le goût.',
@@ -285,6 +287,7 @@ const translations = {
   AR: {
     // Header & Navigation
     'nav.desserts': 'حلوياتنا',
+    'nav.shop': 'المتجر',
     'nav.recipes': 'وصفات',
     'nav.about': 'من نحن',
     'nav.contact': 'اتصل بنا',

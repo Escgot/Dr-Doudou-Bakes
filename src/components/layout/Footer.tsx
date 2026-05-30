@@ -8,6 +8,7 @@ export function Footer() {
   const footerLinks = {
     column1: [
       { label: t('nav.desserts'), href: '/our-desserts' },
+      { label: t('nav.shop'), href: '/shop' },
       { label: t('nav.recipes'), href: '/recipes' },
     ],
     column2: [
@@ -23,7 +24,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3">
               <img
-                src="/images/logo.png"
+                src="/images/Logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-10 h-10 object-contain"
               />
@@ -88,7 +89,9 @@ export function Footer() {
             <p className="text-white/60 text-xs">
               © 2026, <Link to="/" className="hover:text-white transition-colors">Dr Doudou Bakes</Link>
             </p>
-            <div className="flex gap-4" />
+            <div className="flex gap-4">
+              <Link to="/admin" className="text-white/60 text-xs hover:text-white transition-colors">Admin</Link>
+            </div>
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@ export function OurDesserts() {
       description: t('prod.p6.desc'),
     },
     {
-      image: '/images/desserts/cake-slice.jpg',
+      image: '/images/desserts/cake-slice.webp',
       title: t('desserts.cat.p7.title'),
       description: t('desserts.cat.p7.desc'),
     },
@@ -130,7 +130,7 @@ export function OurDesserts() {
       </section>
 
       {/* Product Grid - Instagram style gallery */}
-      <section className="pt-44 lg:pt-64 pb-20 lg:pb-28 bg-[#FEF6ED]">
+      <section className="pt-44 lg:pt-64 pb-20 lg:pb-28 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <span className="font-arabicMain text-5xl lg:text-7xl text-primary block mb-2 opacity-80">
@@ -179,7 +179,7 @@ export function OurDesserts() {
       </section>
 
       {/* Innovation Section */}
-      <section className="py-16 lg:py-24 bg-accent-green">
+      <section className="py-16 lg:py-24 bg-pink">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <AnimatedSection>

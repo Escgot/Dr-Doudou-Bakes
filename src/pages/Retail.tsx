@@ -89,7 +89,7 @@ export function Retail() {
             {retailTypes.map((type, index) => (
               <StaggerItem key={index}>
                 <div className="text-center group">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-pink rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <type.icon className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-primary font-sans text-sm font-semibold tracking-wider mb-2">
@@ -217,7 +217,7 @@ export function Retail() {
               and insights can drive your retail success.
             </p>
             <Link to="/contact">
-              <Button className="bg-primary text-white rounded-full px-8 py-3 hover:bg-primary-dark transition-colors duration-300">
+              <Button className="bg-pink text-white rounded-full px-8 py-3 hover:bg-pink-dark transition-colors duration-300">
                 Contact Our Retail Team
               </Button>
             </Link>

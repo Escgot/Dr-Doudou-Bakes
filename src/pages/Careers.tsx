@@ -96,7 +96,7 @@ export function Careers() {
             {values.map((value, index) => (
               <StaggerItem key={index}>
                 <div className="text-center group">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-pink rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <value.icon className="w-8 h-8 text-white" />
                   </div>
                   <h4 className="text-primary font-sans text-sm font-semibold tracking-wider mb-2">
@@ -136,7 +136,7 @@ export function Careers() {
               <ul className="space-y-3">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full" />
+                    <div className="w-2 h-2 bg-pink rounded-full" />
                     <span className="text-muted-foreground text-sm">{benefit}</span>
                   </li>
                 ))}
@@ -196,7 +196,7 @@ export function Careers() {
               resume and let us know how you can contribute to our mission.
             </p>
             <Link to="/contact">
-              <Button className="bg-primary text-white rounded-full px-8 py-3 hover:bg-primary-dark transition-colors duration-300">
+              <Button className="bg-pink text-white rounded-full px-8 py-3 hover:bg-pink-dark transition-colors duration-300">
                 Submit Your Resume
               </Button>
             </Link>
