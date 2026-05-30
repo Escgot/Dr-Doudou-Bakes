@@ -3,6 +3,8 @@ import { ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useRecipes } from '@/context/RecipeContext';
+
+const RECIPES_DATA: any = {
   'honey-cake': {
     EN: {
       title: 'Heritage Hazelnut & Chocolate Entremets',
