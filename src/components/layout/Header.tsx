@@ -50,22 +50,22 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Logo + Mobile Icons Row */}
         <div className="flex items-center justify-between lg:justify-center py-2 sm:py-3 lg:py-6">
-          {/* Spacer for mobile centering */}
-          <div className="w-16 lg:hidden" />
+          {/* Spacer for mobile centering (balances the right-side icons) */}
+          <div className="w-[72px] sm:w-[88px] lg:hidden flex-shrink-0" />
 
-          <Link to="/" className="flex items-center gap-2 sm:gap-4 lg:gap-6 group">
-            <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
+          <Link to="/" className="flex items-center justify-center gap-1.5 sm:gap-4 lg:gap-6 group flex-shrink-0">
+            <span className="text-white font-brand text-[11px] min-[375px]:text-xs sm:text-base lg:text-2xl tracking-[0.1em] sm:tracking-[0.2em] uppercase drop-shadow-sm whitespace-nowrap">
               Dr Doudou
             </span>
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               <img
                 src="/images/logo.webp"
                 alt="Dr Doudou Bakes logo"
-                className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
+                className="w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
               />
               <div className="absolute -inset-2 bg-white/5 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
+            <span className="text-white font-brand text-[11px] min-[375px]:text-xs sm:text-base lg:text-2xl tracking-[0.1em] sm:tracking-[0.2em] uppercase drop-shadow-sm whitespace-nowrap">
               Bakes
             </span>
           </Link>
@@ -89,24 +89,45 @@ export function Header() {
                   <Menu className="w-6 h-6" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-primary border-primary-dark w-[300px]">
-                <div className="flex flex-col gap-6 mt-8">
+              <SheetContent side="right" className="bg-primary/95 backdrop-blur-2xl border-l border-white/10 w-[85vw] sm:w-[400px] p-8 flex flex-col">
+                <div className="flex items-center mb-12">
+                  <span className="text-white/40 font-brand tracking-[0.3em] text-xs uppercase">Navigation</span>
+                </div>
+                
+                <div className="flex flex-col gap-6 flex-1">
                   {navItems.map((item) => (
                     <Link
                       key={item.label}
                       to={item.href}
                       onClick={() => setIsOpen(false)}
-                      className="text-white text-sm font-medium tracking-widest hover:opacity-80 transition-opacity duration-200"
+                      className={`group flex items-center text-3xl sm:text-4xl font-serif transition-all duration-300 ${
+                        location.pathname === item.href 
+                          ? 'text-white translate-x-2' 
+                          : 'text-white/60 hover:text-white hover:translate-x-2'
+                      }`}
                     >
+                      <span className={`transition-all duration-300 text-amber-500 mr-4 text-2xl ${
+                        location.pathname === item.href ? 'opacity-100' : 'opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0'
+                      }`}>
+                        ✦
+                      </span>
                       {item.label}
                     </Link>
                   ))}
+                </div>
+
+                <div className="mt-auto pt-8 border-t border-white/10 flex flex-col gap-8">
                   <button
-                    onClick={() => toggleLanguage()}
-                    className="text-primary bg-cream text-sm font-bold tracking-widest px-4 py-2 rounded-full hover:bg-cream-dark transition-colors duration-200 text-center mt-4 w-full uppercase"
+                    onClick={() => { toggleLanguage(); setIsOpen(false); }}
+                    className="flex items-center justify-center gap-3 text-primary bg-gradient-to-r from-cream to-white text-sm font-bold tracking-[0.2em] px-6 py-4 rounded-full hover:shadow-[0_0_20px_rgba(255,248,247,0.3)] hover:scale-[1.02] transition-all duration-300 w-full uppercase"
                   >
-                    {language} 🌐
+                    {language === 'EN' ? 'Français' : language === 'FR' ? 'العربية' : 'English'} <span className="text-lg">🌐</span>
                   </button>
+                  
+                  <div className="flex items-center justify-center gap-3 opacity-40">
+                    <img src="/images/logo.webp" alt="logo" className="w-8 h-8 object-contain grayscale" />
+                    <span className="text-white font-brand text-[10px] tracking-widest uppercase">Dr Doudou</span>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
