@@ -14,7 +14,7 @@ function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-primary pt-10 lg:pt-16 pb-0">
+    <section className="bg-primary pt-4 sm:pt-10 lg:pt-16 pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -70,19 +70,19 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center px-4 w-full"
+              className="flex flex-row gap-2 sm:gap-4 items-center justify-center px-2 sm:px-4 w-full"
             >
               <button
                 onClick={() => navigate('/our-desserts')}
-                className="bg-white text-primary px-8 py-3 sm:py-4 rounded-full font-bold tracking-widest hover:bg-cream hover:scale-105 transition-all duration-300 uppercase shadow-lg text-xs sm:text-sm w-full sm:w-auto"
+                className="bg-white text-primary px-4 sm:px-8 py-2.5 sm:py-4 rounded-full font-bold tracking-wider sm:tracking-widest hover:bg-cream hover:scale-105 transition-all duration-300 uppercase shadow-lg text-[10px] sm:text-sm"
               >
                 View Desserts
               </button>
               <button
                 onClick={() => navigate('/shop')}
-                className="bg-pink text-white px-8 py-3 sm:py-4 rounded-full font-bold tracking-widest hover:bg-pink-dark hover:scale-105 transition-all duration-300 uppercase shadow-lg text-xs sm:text-sm flex items-center justify-center gap-2 w-full sm:w-auto border border-pink-light"
+                className="bg-pink text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-full font-bold tracking-wider sm:tracking-widest hover:bg-pink-dark hover:scale-105 transition-all duration-300 uppercase shadow-lg text-[10px] sm:text-sm flex items-center justify-center gap-1 sm:gap-2 border border-pink-light"
               >
-                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" /> Order Delivery Now
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> Order Now
               </button>
             </motion.div>
           </div>

@@ -39,7 +39,7 @@ export function Shop() {
   return (
     <div className="bg-cream">
       {/* Hero Section */}
-      <section className="bg-primary pt-10 lg:pt-16 pb-0">
+      <section className="bg-primary pt-4 sm:pt-10 lg:pt-16 pb-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

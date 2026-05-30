@@ -49,7 +49,7 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Logo Section */}
-        <div className="flex justify-center py-3 lg:py-6">
+        <div className="flex justify-center py-2 sm:py-3 lg:py-6">
           <Link to="/" className="flex items-center gap-2 sm:gap-4 lg:gap-6 group">
             <span className="text-white font-brand text-base sm:text-xl lg:text-2xl tracking-[0.2em] uppercase drop-shadow-sm">
               Dr Doudou
@@ -69,7 +69,7 @@ export function Header() {
         </div>
 
         {/* Navigation */}
-        <nav className="border-t border-white/20 relative">
+        <nav className="lg:border-t lg:border-white/20 relative">
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center justify-center py-4 relative">
             <ul className="flex justify-center items-center gap-8">
