@@ -461,7 +461,7 @@ function FAQSection() {
 // Parallax Image Section
 function ParallaxImage() {
   return (
-    <section className="relative h-[400px] lg:h-[500px] overflow-hidden">
+    <section className="relative h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed"
         style={{ backgroundImage: 'url(/images/desserts/chocolate-mixing.jpg)' }}
