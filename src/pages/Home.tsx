@@ -14,7 +14,7 @@ function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-primary pt-4 sm:pt-10 lg:pt-16 pb-0">
+    <section className="bg-primary -mt-[60px] sm:-mt-[80px] lg:-mt-[140px] pt-[calc(60px+1rem)] sm:pt-[calc(80px+2.5rem)] lg:pt-[calc(140px+4rem)] pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
