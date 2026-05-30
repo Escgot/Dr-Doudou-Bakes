@@ -20,8 +20,7 @@ function HeroSection() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative rounded-[2rem] overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-28 lg:-mb-36 translate-y-16 lg:translate-y-24"
-          style={{ aspectRatio: '16 / 9' }}
+          className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
         >
           {/* Hero Background Image */}
           <img
@@ -98,7 +97,7 @@ function WelcomeSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="pt-52 lg:pt-80 pb-16 lg:py-24 bg-secondary">
+    <section className="pt-32 sm:pt-52 lg:pt-80 pb-16 lg:py-24 bg-secondary">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <AnimatedSection>
           <p className="text-primary text-xs font-medium tracking-[0.2em] mb-6">
