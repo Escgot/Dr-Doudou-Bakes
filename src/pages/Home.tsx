@@ -40,7 +40,7 @@ function HeroSection() {
             >
               {/* Logo icon */}
               <motion.img
-                src="/images/Logo.webp"
+                src="/images/logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-24 h-24 lg:w-48 lg:h-48 object-contain mx-auto mb-2 drop-shadow-lg"
                 initial={{ opacity: 0, y: -20 }}

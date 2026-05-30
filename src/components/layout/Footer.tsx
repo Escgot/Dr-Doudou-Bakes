@@ -24,7 +24,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3">
               <img
-                src="/images/Logo.webp"
+                src="/images/logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-10 h-10 object-contain"
               />

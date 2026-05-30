@@ -56,7 +56,7 @@ export function Header() {
             </span>
             <div className="relative">
               <img
-                src="/images/Logo.webp"
+                src="/images/logo.webp"
                 alt="Dr Doudou Bakes logo"
                 className="w-10 h-10 lg:w-12 lg:h-12 object-contain group-hover:scale-110 transition-transform duration-500"
               />

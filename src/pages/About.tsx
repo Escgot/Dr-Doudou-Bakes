@@ -67,7 +67,7 @@ export function About() {
             <AnimatedSection>
               <div className="flex justify-center">
                 <img
-                  src="/images/Logo.webp"
+                  src="/images/logo.webp"
                   alt="Dr Doudou Bakes logo"
                   className="w-40 h-40 lg:w-56 lg:h-56 object-contain"
                 />

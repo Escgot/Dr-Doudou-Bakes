@@ -205,7 +205,7 @@ export function Contact() {
               <AnimatedSection delay={0.2} className="flex flex-col justify-center">
                 <div className="mb-8">
                   <img
-                    src="/images/Logo.webp"
+                    src="/images/logo.webp"
                     alt="Logo"
                     className="w-24 h-24 lg:w-28 lg:h-28 object-contain drop-shadow-sm"
                   />
