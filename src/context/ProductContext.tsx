@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc,
+  getDocs, writeBatch,
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Product, Category, Badge, Order } from '@/types';
 
-// ── Seed Data ────────────────────────────────────────────────────────
+// ── Seed Data (used only on first-time setup if Firestore is empty) ──
 
 const SEED_CATEGORIES: Category[] = [
   { id: 'cat-1', name: 'All', slug: 'all' },
@@ -98,7 +103,37 @@ const SEED_PRODUCTS: Product[] = [
   },
 ];
 
-// ── Storage Keys ─────────────────────────────────────────────────────
+// ── Firestore helpers ────────────────────────────────────────────────
+
+// Check if Firebase is configured (env vars are set)
+function isFirebaseConfigured(): boolean {
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+  return !!projectId && projectId !== 'your-project-id';
+}
+
+// Collection references
+const productsCol = () => collection(db, 'products');
+const categoriesCol = () => collection(db, 'categories');
+const badgesCol = () => collection(db, 'badges');
+const ordersCol = () => collection(db, 'orders');
+
+// Seed a Firestore collection if it's empty
+async function seedCollection<T extends { id: string }>(
+  colRef: ReturnType<typeof collection>,
+  seedData: T[]
+) {
+  const snap = await getDocs(colRef);
+  if (snap.empty) {
+    const batch = writeBatch(db);
+    for (const item of seedData) {
+      const { id, ...data } = item;
+      batch.set(doc(colRef, id), data);
+    }
+    await batch.commit();
+  }
+}
+
+// ── localStorage fallback (used when Firebase is not configured) ─────
 
 const STORAGE_KEYS = {
   products: 'ddb_products',
@@ -129,6 +164,7 @@ interface ProductContextType {
   badges: Badge[];
   orders: Order[];
   publishedProducts: Product[];
+  isLoading: boolean;
   getProductBySlug: (slug: string) => Product | undefined;
   getProductsByCategory: (categoryId: string) => Product[];
   getBadgesForProduct: (product: Product) => Badge[];
@@ -154,34 +190,103 @@ interface ProductContextType {
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
-// ── Helper ───────────────────────────────────────────────────────────
-
-let idCounter = Date.now();
-function uid(prefix: string) {
-  return `${prefix}-${(idCounter++).toString(36)}`;
-}
-
 // ── Provider ─────────────────────────────────────────────────────────
 
 export function ProductProvider({ children }: { children: React.ReactNode }) {
+  const useFirestore = isFirebaseConfigured();
+
   const [products, setProducts] = useState<Product[]>(() =>
-    loadFromStorage(STORAGE_KEYS.products, SEED_PRODUCTS)
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.products, SEED_PRODUCTS)
   );
   const [categories, setCategories] = useState<Category[]>(() =>
-    loadFromStorage(STORAGE_KEYS.categories, SEED_CATEGORIES)
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.categories, SEED_CATEGORIES)
   );
   const [badges, setBadges] = useState<Badge[]>(() =>
-    loadFromStorage(STORAGE_KEYS.badges, SEED_BADGES)
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.badges, SEED_BADGES)
   );
   const [orders, setOrders] = useState<Order[]>(() =>
-    loadFromStorage(STORAGE_KEYS.orders, [])
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.orders, [])
   );
+  const [isLoading, setIsLoading] = useState(useFirestore);
 
-  // Persist on change
-  useEffect(() => saveToStorage(STORAGE_KEYS.products, products), [products]);
-  useEffect(() => saveToStorage(STORAGE_KEYS.categories, categories), [categories]);
-  useEffect(() => saveToStorage(STORAGE_KEYS.badges, badges), [badges]);
-  useEffect(() => saveToStorage(STORAGE_KEYS.orders, orders), [orders]);
+  // ── Firestore real-time listeners ──────────────────────────────
+  useEffect(() => {
+    if (!useFirestore) return;
+
+    // Seed collections on first run (if empty)
+    const initSeed = async () => {
+      try {
+        await Promise.all([
+          seedCollection(productsCol(), SEED_PRODUCTS),
+          seedCollection(categoriesCol(), SEED_CATEGORIES),
+          seedCollection(badgesCol(), SEED_BADGES),
+        ]);
+      } catch (err) {
+        console.error('Firestore seed error:', err);
+      }
+    };
+    initSeed();
+
+    // Real-time listeners
+    const unsubs: (() => void)[] = [];
+
+    unsubs.push(
+      onSnapshot(productsCol(), (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
+        setProducts(data);
+        setIsLoading(false);
+      }, (err) => {
+        console.error('Products snapshot error:', err);
+        // Fallback to seed data if Firestore fails
+        setProducts(SEED_PRODUCTS);
+        setIsLoading(false);
+      })
+    );
+
+    unsubs.push(
+      onSnapshot(categoriesCol(), (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Category));
+        setCategories(data);
+      }, () => setCategories(SEED_CATEGORIES))
+    );
+
+    unsubs.push(
+      onSnapshot(badgesCol(), (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Badge));
+        setBadges(data);
+      }, () => setBadges(SEED_BADGES))
+    );
+
+    unsubs.push(
+      onSnapshot(ordersCol(), (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Order));
+        setOrders(data);
+      }, () => setOrders([]))
+    );
+
+    return () => unsubs.forEach(fn => fn());
+  }, [useFirestore]);
+
+  // ── localStorage persistence (fallback mode) ──────────────────
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEYS.products, products);
+  }, [products, useFirestore]);
+
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEYS.categories, categories);
+  }, [categories, useFirestore]);
+
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEYS.badges, badges);
+  }, [badges, useFirestore]);
+
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEYS.orders, orders);
+  }, [orders, useFirestore]);
 
   // ── Derived ──────────────────────────────────────────────────────
   const publishedProducts = products.filter(p => p.isPublished);
@@ -210,73 +315,133 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   );
 
   // ── CRUD — Products ──────────────────────────────────────────────
-  const addProduct = useCallback((product: Omit<Product, 'id' | 'createdAt'>) => {
-    const newProduct: Product = {
-      ...product,
-      id: uid('prod'),
-      createdAt: new Date().toISOString(),
-    };
-    setProducts(prev => [...prev, newProduct]);
-  }, []);
+  const addProduct = useCallback(async (product: Omit<Product, 'id' | 'createdAt'>) => {
+    const data = { ...product, createdAt: new Date().toISOString() };
+    if (useFirestore) {
+      await addDoc(productsCol(), data);
+    } else {
+      const id = `prod-${Date.now().toString(36)}`;
+      setProducts(prev => [...prev, { ...data, id }]);
+    }
+  }, [useFirestore]);
 
-  const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
-    setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
-  }, []);
+  const updateProduct = useCallback(async (id: string, updates: Partial<Product>) => {
+    if (useFirestore) {
+      const { id: _id, ...cleanUpdates } = updates as Product;
+      void _id; // avoid unused warning
+      await updateDoc(doc(db, 'products', id), cleanUpdates);
+    } else {
+      setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
+    }
+  }, [useFirestore]);
 
-  const deleteProduct = useCallback((id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-  }, []);
+  const deleteProduct = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'products', id));
+    } else {
+      setProducts(prev => prev.filter(p => p.id !== id));
+    }
+  }, [useFirestore]);
 
-  const togglePublish = useCallback((id: string) => {
-    setProducts(prev =>
-      prev.map(p => (p.id === id ? { ...p, isPublished: !p.isPublished } : p))
-    );
-  }, []);
+  const togglePublish = useCallback(async (id: string) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    if (useFirestore) {
+      await updateDoc(doc(db, 'products', id), { isPublished: !product.isPublished });
+    } else {
+      setProducts(prev =>
+        prev.map(p => (p.id === id ? { ...p, isPublished: !p.isPublished } : p))
+      );
+    }
+  }, [useFirestore, products]);
 
   // ── CRUD — Categories ────────────────────────────────────────────
-  const addCategory = useCallback((category: Omit<Category, 'id'>) => {
-    setCategories(prev => [...prev, { ...category, id: uid('cat') }]);
-  }, []);
+  const addCategory = useCallback(async (category: Omit<Category, 'id'>) => {
+    if (useFirestore) {
+      await addDoc(categoriesCol(), category);
+    } else {
+      const id = `cat-${Date.now().toString(36)}`;
+      setCategories(prev => [...prev, { ...category, id }]);
+    }
+  }, [useFirestore]);
 
-  const updateCategory = useCallback((id: string, updates: Partial<Category>) => {
-    setCategories(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
-  }, []);
+  const updateCategory = useCallback(async (id: string, updates: Partial<Category>) => {
+    if (useFirestore) {
+      const { id: _id, ...cleanUpdates } = updates as Category;
+      void _id;
+      await updateDoc(doc(db, 'categories', id), cleanUpdates);
+    } else {
+      setCategories(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
+    }
+  }, [useFirestore]);
 
-  const deleteCategory = useCallback((id: string) => {
-    setCategories(prev => prev.filter(c => c.id !== id));
-  }, []);
+  const deleteCategory = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'categories', id));
+    } else {
+      setCategories(prev => prev.filter(c => c.id !== id));
+    }
+  }, [useFirestore]);
 
   // ── CRUD — Badges ────────────────────────────────────────────────
-  const addBadge = useCallback((badge: Omit<Badge, 'id'>) => {
-    setBadges(prev => [...prev, { ...badge, id: uid('bdg') }]);
-  }, []);
+  const addBadge = useCallback(async (badge: Omit<Badge, 'id'>) => {
+    if (useFirestore) {
+      await addDoc(badgesCol(), badge);
+    } else {
+      const id = `bdg-${Date.now().toString(36)}`;
+      setBadges(prev => [...prev, { ...badge, id }]);
+    }
+  }, [useFirestore]);
 
-  const updateBadge = useCallback((id: string, updates: Partial<Badge>) => {
-    setBadges(prev => prev.map(b => (b.id === id ? { ...b, ...updates } : b)));
-  }, []);
+  const updateBadge = useCallback(async (id: string, updates: Partial<Badge>) => {
+    if (useFirestore) {
+      const { id: _id, ...cleanUpdates } = updates as Badge;
+      void _id;
+      await updateDoc(doc(db, 'badges', id), cleanUpdates);
+    } else {
+      setBadges(prev => prev.map(b => (b.id === id ? { ...b, ...updates } : b)));
+    }
+  }, [useFirestore]);
 
-  const deleteBadge = useCallback((id: string) => {
-    setBadges(prev => prev.filter(b => b.id !== id));
-  }, []);
+  const deleteBadge = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'badges', id));
+    } else {
+      setBadges(prev => prev.filter(b => b.id !== id));
+    }
+  }, [useFirestore]);
 
   // ── Orders ───────────────────────────────────────────────────────
-  const addOrder = useCallback((order: Order) => {
-    setOrders(prev => [...prev, order]);
-  }, []);
+  const addOrder = useCallback(async (order: Order) => {
+    if (useFirestore) {
+      const { id, ...data } = order;
+      await addDoc(ordersCol(), { ...data, orderId: id });
+    } else {
+      setOrders(prev => [...prev, order]);
+    }
+  }, [useFirestore]);
 
-  const updateOrderStatus = useCallback((id: string, status: Order['status']) => {
-    setOrders(prev => prev.map(o => (o.id === id ? { ...o, status } : o)));
-  }, []);
+  const updateOrderStatus = useCallback(async (id: string, status: Order['status']) => {
+    if (useFirestore) {
+      await updateDoc(doc(db, 'orders', id), { status });
+    } else {
+      setOrders(prev => prev.map(o => (o.id === id ? { ...o, status } : o)));
+    }
+  }, [useFirestore]);
 
-  const deleteOrder = useCallback((id: string) => {
-    setOrders(prev => prev.filter(o => o.id !== id));
-  }, []);
+  const deleteOrder = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'orders', id));
+    } else {
+      setOrders(prev => prev.filter(o => o.id !== id));
+    }
+  }, [useFirestore]);
 
   return (
     <ProductContext.Provider
       value={{
         products, categories, badges, orders,
-        publishedProducts,
+        publishedProducts, isLoading,
         getProductBySlug, getProductsByCategory, getBadgesForProduct, getCategoryById,
         addProduct, updateProduct, deleteProduct, togglePublish,
         addCategory, updateCategory, deleteCategory,
