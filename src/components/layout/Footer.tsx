@@ -11,12 +11,12 @@ export function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-20 pb-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-12 sm:pt-20 pb-8 sm:pb-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-8 mb-10 sm:mb-20">
           
           {/* Brand Column */}
           <div className="lg:col-span-5 flex flex-col items-center md:items-start text-center md:text-left">
-            <Link to="/" className="inline-block mb-6 group">
+            <Link to="/" className="inline-block mb-4 sm:mb-6 group">
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <img src="/images/logo.webp" alt="Dr Doudou Bakes logo" className="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
@@ -35,8 +35,8 @@ export function Footer() {
 
           {/* Links Column 1 */}
           <div className="lg:col-span-2 lg:col-start-7 flex flex-col items-center md:items-start">
-            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-6">Explore</h3>
-            <ul className="flex flex-col gap-4 items-center md:items-start">
+            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-4 sm:mb-6">Explore</h3>
+            <ul className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
               {[
                 { label: t('nav.desserts'), href: '/our-desserts' },
                 { label: t('nav.shop'), href: '/shop' },
@@ -53,8 +53,8 @@ export function Footer() {
 
           {/* Links Column 2 */}
           <div className="lg:col-span-2 flex flex-col items-center md:items-start">
-            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-6">Company</h3>
-            <ul className="flex flex-col gap-4 items-center md:items-start">
+            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-4 sm:mb-6">Company</h3>
+            <ul className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
               {[
                 { label: t('nav.about'), href: '/about' },
                 { label: t('nav.contact'), href: '/contact' },
@@ -70,7 +70,7 @@ export function Footer() {
 
           {/* Contact Column */}
           <div className="lg:col-span-2 flex flex-col items-center md:items-start">
-            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-6">Connect</h3>
+            <h3 className="font-brand text-xs tracking-[0.2em] text-white/40 uppercase mb-4 sm:mb-6">Connect</h3>
             <div className="flex flex-col gap-4 items-center md:items-start text-cream/70 text-sm">
               <a href="https://www.instagram.com/dr_doudou_bakes/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-amber-400 transition-colors group">
                 <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-amber-400/50 transition-colors">
@@ -90,7 +90,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="border-t border-white/10 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
           <p className="text-white/40 text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-center md:text-left">
             © {new Date().getFullYear()} Dr Doudou Bakes. All rights reserved.
           </p>
