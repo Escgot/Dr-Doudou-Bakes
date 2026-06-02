@@ -36,8 +36,10 @@ interface CartContextType {
   // Delivery selection (stored here so it persists through checkout steps)
   deliveryDate: string | null;
   deliveryWindow: string | null;
+  deliveryRegion: string | null;
   setDeliveryDate: (date: string | null) => void;
   setDeliveryWindow: (window: string | null) => void;
+  setDeliveryRegion: (region: string | null) => void;
   // Drawer
   isCartOpen: boolean;
   openCart: () => void;
@@ -49,12 +51,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // ── Provider ─────────────────────────────────────────────────────────
 
-const DELIVERY_FEE = 5.00; // TND
+export const DELIVERY_REGIONS = [
+  { id: 'monastir', label: 'Monastir', price: 3 },
+  { id: 'sfax-zone-1', label: 'Sfax (Route de Tunis / Route de Mahdia / Nassria)', price: 5 },
+  { id: 'sfax-zone-2', label: 'Sfax (Bouacida / Kaaniche)', price: 1 }
+];
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadCart);
   const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [deliveryWindow, setDeliveryWindow] = useState<string | null>(null);
+  const [deliveryRegion, setDeliveryRegion] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Persist
@@ -134,7 +141,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Final totals
   const cartTotal = Math.max(0, rawTotal - discount);
-  const deliveryFee = (items.length > 0 && !hasFreeDelivery) ? DELIVERY_FEE : 0;
+  const regionPrice = DELIVERY_REGIONS.find(r => r.id === deliveryRegion)?.price || 0;
+  const deliveryFee = (items.length > 0 && !hasFreeDelivery && deliveryRegion) ? regionPrice : 0;
 
 
   const addToCart = useCallback((product: Product, quantity = 1) => {
@@ -172,6 +180,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
     setDeliveryDate(null);
     setDeliveryWindow(null);
+    setDeliveryRegion(null);
   }, []);
 
   const isInCart = useCallback(
@@ -188,7 +197,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         items, cartCount, cartTotal, discount, appliedOffers, deliveryFee,
         addToCart, removeFromCart, updateQuantity, clearCart, isInCart,
-        deliveryDate, deliveryWindow, setDeliveryDate, setDeliveryWindow,
+        deliveryDate, deliveryWindow, deliveryRegion, setDeliveryDate, setDeliveryWindow, setDeliveryRegion,
         isCartOpen, openCart, closeCart, toggleCart,
       }}
     >

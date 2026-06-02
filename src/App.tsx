@@ -6,6 +6,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
 import { RecipeProvider } from './context/RecipeContext';
+import { GalleryProvider } from './context/GalleryContext';
 import { CartDrawer } from './components/shared/CartDrawer';
 
 // Lazy load components
@@ -36,6 +37,7 @@ function App() {
   return (
     <LanguageProvider>
       <RecipeProvider>
+        <GalleryProvider>
         <ProductProvider>
           <CartProvider>
             <Router>
@@ -63,6 +65,7 @@ function App() {
             </Router>
           </CartProvider>
         </ProductProvider>
+        </GalleryProvider>
       </RecipeProvider>
     </LanguageProvider>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, MapPin, Calendar, CreditCard, ShoppingBag } from 'lucide-react';
-import { useCart } from '@/context/CartContext';
+import { useCart, DELIVERY_REGIONS } from '@/context/CartContext';
 import { useProducts } from '@/context/ProductContext';
 import { DeliveryDatePicker } from '@/components/shared/DeliveryDatePicker';
 import { PaymentForm } from '@/components/shared/PaymentForm';
@@ -11,13 +11,13 @@ import type { OrderCustomer } from '@/types';
 type CheckoutStep = 'details' | 'delivery' | 'payment';
 
 export function Checkout() {
-  const { items, cartTotal, discount, appliedOffers, deliveryFee, deliveryDate, deliveryWindow, setDeliveryDate, setDeliveryWindow, clearCart } = useCart();
+  const { items, cartTotal, discount, appliedOffers, deliveryFee, deliveryDate, deliveryWindow, deliveryRegion, setDeliveryDate, setDeliveryWindow, setDeliveryRegion, clearCart } = useCart();
   const { addOrder } = useProducts();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<CheckoutStep>('details');
   const [customer, setCustomer] = useState<OrderCustomer>({
-    name: '', email: '', phone: '', address: ''
+    name: '', email: '', phone: '', address: '', region: deliveryRegion || ''
   });
 
   const rawTotal = cartTotal + discount;
@@ -32,7 +32,14 @@ export function Checkout() {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!customer.region) return;
     setStep('delivery');
+  };
+
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setCustomer(c => ({...c, region: val}));
+    setDeliveryRegion(val);
   };
 
   const handleDeliverySubmit = () => {
@@ -161,6 +168,20 @@ export function Checkout() {
                       />
                     </div>
                     <div>
+                      <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Delivery Region *</label>
+                      <select
+                        required
+                        value={customer.region || ''}
+                        onChange={handleRegionChange}
+                        className="w-full px-4 py-3 bg-cream/30 border border-primary/20 rounded-xl text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                      >
+                        <option value="" disabled>Select your region</option>
+                        {DELIVERY_REGIONS.map(r => (
+                          <option key={r.id} value={r.id}>{r.label} ({r.price} TND)</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
                       <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Delivery Address *</label>
                       <textarea
                         required
@@ -277,8 +298,10 @@ export function Checkout() {
                 )}
                 <div className="flex justify-between items-center text-muted-foreground">
                   <span>Delivery</span>
-                  {deliveryFee === 0 && discount > 0 ? (
+                  {deliveryFee === 0 && discount > 0 && appliedOffers.some(o => o.includes('Free Delivery')) ? (
                     <span className="text-emerald-600 font-medium uppercase text-xs tracking-wider">Free</span>
+                  ) : !deliveryRegion ? (
+                    <span className="text-primary/60 italic text-sm">Select region</span>
                   ) : (
                     <span className="text-primary font-medium">{deliveryFee.toFixed(2)} TND</span>
                   )}

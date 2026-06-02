@@ -82,7 +82,7 @@ export function Contact() {
                         Phone
                       </h4>
                       <p className="text-muted-foreground text-base leading-relaxed">
-                        (+216) 00 000 000
+                        (+216) 99 270 488
                       </p>
                     </div>
                   </div>
@@ -140,7 +140,7 @@ export function Contact() {
                         <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.phone.label')}</label>
                         <input
                           type="tel"
-                          placeholder="(+216) 00 000 000"
+                          placeholder="(+216) 99 270 488"
                           className="w-full px-5 py-4 bg-[#FCFBF8] border border-[#EAE1D2] rounded-xl text-base md:text-lg text-[#5C4A3D] placeholder:text-[#B3A698] focus:outline-none focus:border-[#C4A98C] focus:ring-1 focus:ring-[#C4A98C] transition-all"
                         />
                       </div>

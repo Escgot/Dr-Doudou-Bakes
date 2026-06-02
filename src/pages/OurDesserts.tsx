@@ -1,73 +1,22 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '@/components/shared/AnimatedSection';
 import { useLanguage } from '@/context/LanguageContext';
+import { useGallery } from '@/context/GalleryContext';
 
 export function OurDesserts() {
-  const { t } = useLanguage();
-  const categories = [
-    {
-      image: '/images/desserts/single-serve.jpg',
-      title: t('prod.p1.title'),
-      description: t('prod.p1.desc'),
-    },
-    {
-      image: '/images/desserts/prepackaged.jpg',
-      title: t('prod.p2.title'),
-      description: t('prod.p2.desc'),
-    },
-    {
-      image: '/images/desserts/gateau courant noisettes chocolat.jpg',
-      title: t('prod.p3.title'),
-      description: t('prod.p3.desc'),
-    },
-    {
-      image: '/images/desserts/premium-cake.jpg',
-      title: t('prod.p4.title'),
-      description: t('prod.p4.desc'),
-    },
-    {
-      image: '/images/desserts/cheesecake.jpg',
-      title: t('prod.p5.title'),
-      description: t('prod.p5.desc'),
-    },
-    {
-      image: '/images/desserts/brownies.jpg',
-      title: t('prod.p6.title'),
-      description: t('prod.p6.desc'),
-    },
-    {
-      image: '/images/desserts/cake-slice.webp',
-      title: t('desserts.cat.p7.title'),
-      description: t('desserts.cat.p7.desc'),
-    },
-    {
-      image: '/images/desserts/chocolate-roll.jpg',
-      title: t('desserts.cat.p8.title'),
-      description: t('desserts.cat.p8.desc'),
-    },
-    {
-      image: '/images/desserts/honey-cake.jpg',
-      title: t('desserts.cat.p9.title'),
-      description: t('desserts.cat.p9.desc'),
-    },
-    {
-      image: '/images/desserts/macarons.jpg',
-      title: t('desserts.cat.p10.title'),
-      description: t('desserts.cat.p10.desc'),
-    },
-    {
-      image: '/images/desserts/fruit-tart.jpg',
-      title: t('desserts.cat.p11.title'),
-      description: t('desserts.cat.p11.desc'),
-    },
-    {
-      image: '/images/desserts/chocolate-truffles.jpg',
-      title: t('desserts.cat.p12.title'),
-      description: t('desserts.cat.p12.desc'),
-    },
-  ];
+  const { t, language } = useLanguage();
+  const { galleryItems } = useGallery();
+
+  const categories = useMemo(() =>
+    galleryItems.map(item => ({
+      image: item.image,
+      title: language === 'FR' ? item.titleFR : language === 'AR' ? item.titleAR : item.titleEN,
+      description: language === 'FR' ? item.descriptionFR : language === 'AR' ? item.descriptionAR : item.descriptionEN,
+    })),
+    [galleryItems, language]
+  );
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 

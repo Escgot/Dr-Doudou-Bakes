@@ -53,6 +53,7 @@ export interface OrderCustomer {
   email: string;
   phone: string;
   address: string;
+  region: string;
 }
 
 export interface Order {
@@ -98,4 +99,18 @@ export interface Recipe {
     FR: RecipeContent;
     AR: RecipeContent;
   };
+}
+
+// ── Dessert Gallery ──────────────────────────────────────────────────
+
+export interface GalleryItem {
+  id: string;
+  image: string;           // path or URL
+  titleEN: string;
+  titleFR: string;
+  titleAR: string;
+  descriptionEN: string;
+  descriptionFR: string;
+  descriptionAR: string;
+  sortOrder: number;
 }
