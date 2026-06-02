@@ -119,7 +119,7 @@ export function Careers() {
             <AnimatedSection>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="/images/desserts/trend-innovation.jpg"
+                  src="/images/desserts/trend-innovation.webp"
                   alt="Team collaboration"
                   className="w-full h-full object-cover"
                 />

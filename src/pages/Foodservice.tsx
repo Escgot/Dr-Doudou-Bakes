@@ -58,7 +58,7 @@ export function Foodservice() {
             className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-2xl z-20 -mb-20 sm:-mb-24 lg:-mb-32 translate-y-10 sm:translate-y-12 lg:translate-y-20"
           >
             <img
-              src="/images/desserts/premium-cake.jpg"
+              src="/images/desserts/premium-cake.webp"
               alt="Premium dessert display"
               className="w-full h-full object-cover"
             />
@@ -203,9 +203,9 @@ export function Foodservice() {
 
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { image: '/images/desserts/cheesecake.jpg', title: 'Premium Cheesecakes' },
+              { image: '/images/desserts/cheesecake.webp', title: 'Premium Cheesecakes' },
               { image: '/images/desserts/cake-slice.webp', title: 'Layer Cakes' },
-              { image: '/images/desserts/brownies.jpg', title: 'Brownies & Bars' },
+              { image: '/images/desserts/halwa.webp', title: 'Brownies & Bars' },
             ].map((product, index) => (
               <StaggerItem key={index}>
                 <div className="group">
@@ -298,7 +298,7 @@ export function Foodservice() {
             <AnimatedSection>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="/images/desserts/single-serve.jpg"
+                  src="/images/desserts/single-serve.webp"
                   alt="Retail desserts"
                   className="w-full h-full object-cover"
                 />
@@ -352,8 +352,8 @@ export function Foodservice() {
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { image: '/images/desserts/seasonal-pie.jpg', title: 'Seasonal Pies' },
-              { image: '/images/desserts/premium-cake.jpg', title: 'Premium Cakes' },
-              { image: '/images/desserts/brownies.jpg', title: 'Brownie Platters' },
+              { image: '/images/desserts/premium-cake.webp', title: 'Premium Cakes' },
+              { image: '/images/desserts/halwa.webp', title: 'Brownie Platters' },
             ].map((product, index) => (
               <StaggerItem key={index}>
                 <div className="group">

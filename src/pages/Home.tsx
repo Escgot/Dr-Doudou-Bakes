@@ -464,7 +464,7 @@ function ParallaxImage() {
     <section className="relative h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed"
-        style={{ backgroundImage: 'url(/images/desserts/chocolate-mixing.jpg)' }}
+        style={{ backgroundImage: 'url(/images/desserts/chocolate-mixing.webp)' }}
       />
       <div className="absolute inset-0 bg-black/10" />
     </section>
@@ -588,14 +588,14 @@ export function Home() {
       <HeroSection />
       <WelcomeSection />
       <TwoColumnSection
-        imageSrc="/images/desserts/cocoa-powder.jpg"
+        imageSrc="/images/desserts/cocoa-powder.webp"
         imageAlt="Layered cake slice"
         imagePosition="right"
         title={t('col1.title')}
         description={t('col1.desc')}
       />
       <TwoColumnSection
-        imageSrc="/images/desserts/chocolate-roll.jpg"
+        imageSrc="/images/desserts/chocolate-roll.webp"
         imageAlt="Chocolate dessert roll"
         imagePosition="left"
         title={t('col2.title')}

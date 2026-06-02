@@ -131,7 +131,7 @@ const INITIAL_RECIPES: Recipe[] = [
   },
   {
     id: 'chocolate-roll',
-    imageUrl: '/images/desserts/russe-pistache.jpg',
+    imageUrl: '/images/desserts/russe-pistache.webp',
     prepTime: '1h',
     difficulty: 'Hard',
     servings: 12,
@@ -248,7 +248,7 @@ const INITIAL_RECIPES: Recipe[] = [
   },
   {
     id: 'vanilla-cheesecake',
-    imageUrl: '/images/desserts/cheesecake.jpg',
+    imageUrl: '/images/desserts/cheesecake.webp',
     prepTime: '20m',
     difficulty: 'Easy',
     servings: 20,
@@ -335,7 +335,7 @@ const INITIAL_RECIPES: Recipe[] = [
   },
   {
     id: 'dark-brownie',
-    imageUrl: '/images/desserts/gateau courant noisettes chocolat.jpg',
+    imageUrl: '/images/desserts/gateau courant noisettes chocolat.webp',
     prepTime: '45m',
     difficulty: 'Medium',
     servings: 12,
@@ -443,7 +443,7 @@ const INITIAL_RECIPES: Recipe[] = [
   },
   {
     id: 'seasonal-berry-pie',
-    imageUrl: '/images/desserts/brownies.jpg',
+    imageUrl: '/images/desserts/halwa.webp',
     prepTime: '1h',
     difficulty: 'Hard',
     servings: 8,
@@ -527,7 +527,7 @@ const INITIAL_RECIPES: Recipe[] = [
   },
   {
     id: 'mini-tarts',
-    imageUrl: '/images/desserts/single-serve.jpg',
+    imageUrl: '/images/desserts/single-serve.webp',
     prepTime: '50m',
     difficulty: 'Medium',
     servings: 4,

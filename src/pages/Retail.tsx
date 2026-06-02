@@ -37,7 +37,7 @@ export function Retail() {
             className="relative rounded-2xl overflow-hidden aspect-[16/9] lg:aspect-[21/9]"
           >
             <img
-              src="/images/desserts/prepackaged.jpg"
+              src="/images/desserts/prepackaged.webp"
               alt="Retail dessert display"
               className="w-full h-full object-cover"
             />
@@ -129,7 +129,7 @@ export function Retail() {
             <AnimatedSection>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <img
-                  src="/images/desserts/single-serve.jpg"
+                  src="/images/desserts/single-serve.webp"
                   alt="Retail desserts"
                   className="w-full h-full object-cover"
                 />
@@ -183,8 +183,8 @@ export function Retail() {
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { image: '/images/desserts/seasonal-pie.jpg', title: 'Seasonal Pies' },
-              { image: '/images/desserts/premium-cake.jpg', title: 'Premium Cakes' },
-              { image: '/images/desserts/brownies.jpg', title: 'Brownie Platters' },
+              { image: '/images/desserts/premium-cake.webp', title: 'Premium Cakes' },
+              { image: '/images/desserts/halwa.webp', title: 'Brownie Platters' },
             ].map((product, index) => (
               <StaggerItem key={index}>
                 <div className="group">

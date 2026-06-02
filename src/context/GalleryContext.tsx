@@ -11,7 +11,7 @@ import type { GalleryItem } from '@/types';
 const SEED_GALLERY: GalleryItem[] = [
   {
     id: 'gal-1',
-    image: '/images/desserts/single-serve.jpg',
+    image: '/images/desserts/single-serve.webp',
     titleEN: 'SINGLE-SERVE',
     titleFR: 'Chocolate Brownie',
     titleAR: 'حصص فردية',
@@ -22,7 +22,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-2',
-    image: '/images/desserts/prepackaged.jpg',
+    image: '/images/desserts/prepackaged.webp',
     titleEN: 'PREPACKAGED',
     titleFR: 'Boulettes Biscuits & Amandes',
     titleAR: 'مغلف مسبقاً',
@@ -33,7 +33,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-3',
-    image: '/images/desserts/gateau courant noisettes chocolat.jpg',
+    image: '/images/desserts/gateau courant noisettes chocolat.webp',
     titleEN: 'SEASONAL & NEW',
     titleFR: 'SAISONNIER ET NOUVEAU',
     titleAR: 'موسمي وجديد',
@@ -44,7 +44,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-4',
-    image: '/images/desserts/premium-cake.jpg',
+    image: '/images/desserts/premium-cake.webp',
     titleEN: 'PREMIUM CAKES',
     titleFR: 'GÂTEAUX PREMIUM',
     titleAR: 'كيك فاخر',
@@ -55,7 +55,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-5',
-    image: '/images/desserts/cheesecake.jpg',
+    image: '/images/desserts/cheesecake.webp',
     titleEN: 'PREMIUM CHEESECAKES',
     titleFR: 'Boulettes Biscuits & Amandes',
     titleAR: 'تشيز كيك بريميوم',
@@ -66,7 +66,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-6',
-    image: '/images/desserts/brownies.jpg',
+    image: '/images/desserts/halwa.webp',
     titleEN: 'BROWNIES & BARS',
     titleFR: 'Pâte Sablée',
     titleAR: 'براونيز وقوالب',
@@ -88,7 +88,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-8',
-    image: '/images/desserts/chocolate-roll.jpg',
+    image: '/images/desserts/chocolate-roll.webp',
     titleEN: 'GLUTEN-FREE',
     titleFR: 'SANS GLUTEN',
     titleAR: 'خالي من الغلوتين',
@@ -99,7 +99,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-9',
-    image: '/images/desserts/honey-cake.jpg',
+    image: '/images/desserts/honey-cake.webp',
     titleEN: 'HONEY CAKES',
     titleFR: 'GÂTEAUX AU MIEL',
     titleAR: 'كيك العسل',
@@ -110,7 +110,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-10',
-    image: '/images/desserts/macarons.jpg',
+    image: '/images/desserts/macarons.webp',
     titleEN: 'FRENCH MACARONS',
     titleFR: 'MACARONS FRANÇAIS',
     titleAR: 'ماكرون فرنسي',
@@ -132,7 +132,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-12',
-    image: '/images/desserts/chocolate-truffles.jpg',
+    image: '/images/desserts/chocolate-truffles.webp',
     titleEN: 'ARTISAN TRUFFLES',
     titleFR: 'TRUFFES ARTISANALES',
     titleAR: 'ترافل حرفي',
