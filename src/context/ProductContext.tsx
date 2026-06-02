@@ -4,7 +4,7 @@ import {
   getDocs, writeBatch,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { Product, Category, Badge, Order } from '@/types';
+import type { Product, Category, Badge, Order, ContactMessage, ContactMessageStatus } from '@/types';
 
 // ── Seed Data (used only on first-time setup if Firestore is empty) ──
 
@@ -116,6 +116,7 @@ const productsCol = () => collection(db, 'products');
 const categoriesCol = () => collection(db, 'categories');
 const badgesCol = () => collection(db, 'badges');
 const ordersCol = () => collection(db, 'orders');
+const contactMessagesCol = () => collection(db, 'contactMessages');
 
 // Seed a Firestore collection if it's empty
 async function seedCollection<T extends { id: string }>(
@@ -140,6 +141,7 @@ const STORAGE_KEYS = {
   categories: 'ddb_categories',
   badges: 'ddb_badges',
   orders: 'ddb_orders',
+  contactMessages: 'ddb_contact_messages',
 };
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -163,6 +165,7 @@ interface ProductContextType {
   categories: Category[];
   badges: Badge[];
   orders: Order[];
+  contactMessages: ContactMessage[];
   publishedProducts: Product[];
   isLoading: boolean;
   getProductBySlug: (slug: string) => Product | undefined;
@@ -186,6 +189,10 @@ interface ProductContextType {
   addOrder: (order: Order) => void;
   updateOrderStatus: (id: string, status: Order['status']) => void;
   deleteOrder: (id: string) => void;
+  // Contact inbox
+  addContactMessage: (message: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+  updateContactMessageStatus: (id: string, status: ContactMessageStatus) => Promise<void>;
+  deleteContactMessage: (id: string) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -206,6 +213,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   );
   const [orders, setOrders] = useState<Order[]>(() =>
     useFirestore ? [] : loadFromStorage(STORAGE_KEYS.orders, [])
+  );
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>(() =>
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.contactMessages, [])
   );
   const [isLoading, setIsLoading] = useState(useFirestore);
 
@@ -264,6 +274,13 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       }, () => setOrders([]))
     );
 
+    unsubs.push(
+      onSnapshot(contactMessagesCol(), (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as ContactMessage));
+        setContactMessages(data);
+      }, () => setContactMessages([]))
+    );
+
     return () => unsubs.forEach(fn => fn());
   }, [useFirestore]);
 
@@ -287,6 +304,11 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     if (useFirestore) return;
     saveToStorage(STORAGE_KEYS.orders, orders);
   }, [orders, useFirestore]);
+
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEYS.contactMessages, contactMessages);
+  }, [contactMessages, useFirestore]);
 
   // ── Derived ──────────────────────────────────────────────────────
   const publishedProducts = products.filter(p => p.isPublished);
@@ -437,16 +459,52 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     }
   }, [useFirestore]);
 
+  // Contact inbox
+  const addContactMessage = useCallback(async (message: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>) => {
+    const data = {
+      ...message,
+      email: message.email.trim(),
+      status: 'unread' as ContactMessageStatus,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (useFirestore) {
+      await addDoc(contactMessagesCol(), data);
+    } else {
+      const id = `msg-${Date.now().toString(36)}`;
+      setContactMessages(prev => [{ ...data, id }, ...prev]);
+    }
+  }, [useFirestore]);
+
+  const updateContactMessageStatus = useCallback(async (id: string, status: ContactMessageStatus) => {
+    if (useFirestore) {
+      await updateDoc(doc(db, 'contactMessages', id), { status });
+    } else {
+      setContactMessages(prev => prev.map(message => (
+        message.id === id ? { ...message, status } : message
+      )));
+    }
+  }, [useFirestore]);
+
+  const deleteContactMessage = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'contactMessages', id));
+    } else {
+      setContactMessages(prev => prev.filter(message => message.id !== id));
+    }
+  }, [useFirestore]);
+
   return (
     <ProductContext.Provider
       value={{
-        products, categories, badges, orders,
+        products, categories, badges, orders, contactMessages,
         publishedProducts, isLoading,
         getProductBySlug, getProductsByCategory, getBadgesForProduct, getCategoryById,
         addProduct, updateProduct, deleteProduct, togglePublish,
         addCategory, updateCategory, deleteCategory,
         addBadge, updateBadge, deleteBadge,
         addOrder, updateOrderStatus, deleteOrder,
+        addContactMessage, updateContactMessageStatus, deleteContactMessage,
       }}
     >
       {children}

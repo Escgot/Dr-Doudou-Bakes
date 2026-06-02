@@ -71,6 +71,20 @@ export interface Order {
   createdAt: string;         // ISO date
 }
 
+export type ContactMessageStatus = 'unread' | 'read';
+export type ContactMessageSource = 'contact-page' | 'home-page';
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  source: ContactMessageSource;
+  status: ContactMessageStatus;
+  createdAt: string;         // ISO date
+}
+
 // ── Recipes ──────────────────────────────────────────────────────────
 
 export interface IngredientGroup {

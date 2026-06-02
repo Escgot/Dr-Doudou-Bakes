@@ -4,7 +4,7 @@ import { AnimatedSection } from '@/components/shared/AnimatedSection';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useProducts } from '@/context/ProductContext';
 import { useCart } from '@/context/CartContext';
@@ -474,6 +474,39 @@ function ParallaxImage() {
 // Contact Section
 function ContactSection() {
   const { t } = useLanguage();
+  const { addContactMessage } = useProducts();
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: '',
+  });
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (submitState !== 'idle') setSubmitState('idle');
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitState('submitting');
+
+    try {
+      await addContactMessage({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
+        source: 'home-page',
+      });
+      setFormData({ name: '', phone: '', email: '', message: '' });
+      setSubmitState('success');
+    } catch (error) {
+      console.error('Contact message submit error:', error);
+      setSubmitState('error');
+    }
+  };
 
   return (
     <section className="py-16 lg:py-24 bg-cream">
@@ -491,35 +524,53 @@ function ContactSection() {
 
           {/* Form */}
           <AnimatedSection delay={0.2}>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input
                   type="text"
+                  value={formData.name}
+                  onChange={event => handleInputChange('name', event.target.value)}
                   placeholder={t('contact.name')}
+                  required
                   className="w-full px-4 py-3 bg-inputBg rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 <input
                   type="tel"
+                  value={formData.phone}
+                  onChange={event => handleInputChange('phone', event.target.value)}
                   placeholder={t('contact.phone')}
+                  required
                   className="w-full px-4 py-3 bg-inputBg rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <input
                 type="email"
+                value={formData.email}
+                onChange={event => handleInputChange('email', event.target.value)}
                 placeholder={t('contact.email')}
                 className="w-full px-4 py-3 bg-inputBg rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <textarea
+                value={formData.message}
+                onChange={event => handleInputChange('message', event.target.value)}
                 placeholder={t('contact.message')}
+                required
                 rows={4}
                 className="w-full px-4 py-3 bg-inputBg rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
               <Button
                 type="submit"
+                disabled={submitState === 'submitting'}
                 className="w-full bg-pink text-white rounded-full py-3 hover:bg-pink-dark transition-colors duration-300"
               >
-                {t('contact.submit')}
+                {submitState === 'submitting' ? t('contact.submit.sending') : t('contact.submit')}
               </Button>
+              {submitState === 'success' && (
+                <p className="text-center text-sm text-emerald-700">{t('contact.submit.success')}</p>
+              )}
+              {submitState === 'error' && (
+                <p className="text-center text-sm text-red-700">{t('contact.submit.error')}</p>
+              )}
             </form>
           </AnimatedSection>
         </div>

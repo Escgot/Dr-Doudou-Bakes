@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, MapPin } from 'lucide-react';
+import { Instagram, Facebook } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function Footer() {
@@ -78,12 +78,13 @@ export function Footer() {
                 </div>
                 <span>Instagram</span>
               </a>
-              <div className="flex items-center gap-3 mt-2">
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <MapPin className="w-4 h-4 text-white/40" />
+              <a href="https://www.facebook.com/profile.php?id=61589840379816" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-amber-400 transition-colors group">
+                <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-amber-400/50 transition-colors">
+                  <Facebook className="w-4 h-4" />
                 </div>
-                <span>Sfax, Tunisia</span>
-              </div>
+                <span>Facebook</span>
+              </a>
+
             </div>
           </div>
 

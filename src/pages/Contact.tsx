@@ -1,11 +1,47 @@
+import { useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '@/components/shared/AnimatedSection';
-import { MapPin, Phone, Mail, Instagram } from 'lucide-react';
+import { Phone, Mail, Instagram, Facebook } from 'lucide-react';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useProducts } from '@/context/ProductContext';
 
 export function Contact() {
   const { t, language } = useLanguage();
+  const { addContactMessage } = useProducts();
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: '',
+  });
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (submitState !== 'idle') setSubmitState('idle');
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitState('submitting');
+
+    try {
+      await addContactMessage({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
+        source: 'contact-page',
+      });
+      setFormData({ name: '', phone: '', email: '', message: '' });
+      setSubmitState('success');
+    } catch (error) {
+      console.error('Contact message submit error:', error);
+      setSubmitState('error');
+    }
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -58,20 +94,6 @@ export function Contact() {
                 </p>
 
                 <div className="space-y-8">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h4 className="text-primary font-serif text-lg tracking-wider mb-1">
-                        {t('contact.hq.title')}
-                      </h4>
-                      <p className="text-muted-foreground text-base leading-relaxed">
-                        Dr Doudou Bakes<br />
-                        Sfax, Tunisia
-                      </p>
-                    </div>
-                  </div>
 
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -115,7 +137,26 @@ export function Contact() {
                         rel="noopener noreferrer"
                         className="text-muted-foreground text-base leading-relaxed hover:text-primary transition-colors"
                       >
-                        {t('contact.follow')}
+                        {t('contact.follow.instagram')}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-pink/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Facebook className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="text-primary font-serif text-lg tracking-wider mb-1">
+                        Facebook
+                      </h4>
+                      <a
+                        href="https://www.facebook.com/profile.php?id=61589840379816"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground text-base leading-relaxed hover:text-primary transition-colors"
+                      >
+                        {t('contact.follow.facebook')}
                       </a>
                     </div>
                   </div>
@@ -125,21 +166,27 @@ export function Contact() {
               {/* Right Form Card */}
               <AnimatedSection delay={0.2} className="w-full max-w-2xl mx-auto lg:mx-0">
                 <div className="bg-[#F8F5F0] rounded-[2rem] p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-8">
-                  <form className="space-y-8">
+                  <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.name.label')}</label>
+                        <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.name.label')} *</label>
                         <input
                           type="text"
+                          required
+                          value={formData.name}
+                          onChange={event => handleInputChange('name', event.target.value)}
                           placeholder={t('contact.name.placeholder')}
                           className="w-full px-5 py-4 bg-[#FCFBF8] border border-[#EAE1D2] rounded-xl text-base md:text-lg text-[#5C4A3D] placeholder:text-[#B3A698] focus:outline-none focus:border-[#C4A98C] focus:ring-1 focus:ring-[#C4A98C] transition-all"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.phone.label')}</label>
+                        <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.phone.label')} *</label>
                         <input
                           type="tel"
+                          required
+                          value={formData.phone}
+                          onChange={event => handleInputChange('phone', event.target.value)}
                           placeholder="(+216) 99 270 488"
                           className="w-full px-5 py-4 bg-[#FCFBF8] border border-[#EAE1D2] rounded-xl text-base md:text-lg text-[#5C4A3D] placeholder:text-[#B3A698] focus:outline-none focus:border-[#C4A98C] focus:ring-1 focus:ring-[#C4A98C] transition-all"
                         />
@@ -147,9 +194,13 @@ export function Contact() {
                     </div>
 
                     <div>
-                      <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.email.label')}</label>
+                      <label className="text-[#A4886E] text-sm font-serif mb-3 block">
+                        {t('contact.email.label')} <span className="text-xs opacity-60 font-sans ml-1">({language === 'AR' ? 'اختياري' : 'Optional'})</span>
+                      </label>
                       <input
                         type="email"
+                        value={formData.email}
+                        onChange={event => handleInputChange('email', event.target.value)}
                         placeholder="your@email.com"
                         className="w-full px-5 py-4 bg-[#FCFBF8] border border-[#EAE1D2] rounded-xl text-base md:text-lg text-[#5C4A3D] placeholder:text-[#B3A698] focus:outline-none focus:border-[#C4A98C] focus:ring-1 focus:ring-[#C4A98C] transition-all"
                       />
@@ -158,7 +209,10 @@ export function Contact() {
                     <div>
                       <label className="text-[#A4886E] text-sm font-serif mb-3 block">{t('contact.message.label')}</label>
                       <textarea
+                        value={formData.message}
+                        onChange={event => handleInputChange('message', event.target.value)}
                         placeholder={t('contact.message.placeholder')}
+                        required
                         rows={5}
                         className="w-full px-5 py-4 bg-[#FCFBF8] border border-[#EAE1D2] rounded-xl text-base md:text-lg text-[#5C4A3D] placeholder:text-[#B3A698] focus:outline-none focus:border-[#C4A98C] focus:ring-1 focus:ring-[#C4A98C] transition-all resize-none"
                       />
@@ -167,10 +221,17 @@ export function Contact() {
                     <div className="pt-4">
                       <button
                         type="submit"
-                        className="w-full bg-[#75553C] hover:bg-[#5D422E] text-white rounded-xl py-4 font-serif tracking-widest text-sm md:text-base transition-colors duration-300 shadow-md uppercase"
+                        disabled={submitState === 'submitting'}
+                        className="w-full bg-[#75553C] hover:bg-[#5D422E] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl py-4 font-serif tracking-widest text-sm md:text-base transition-colors duration-300 shadow-md uppercase"
                       >
-                        {t('contact.submit.btn')}
+                        {submitState === 'submitting' ? t('contact.submit.sending') : t('contact.submit.btn')}
                       </button>
+                      {submitState === 'success' && (
+                        <p className="text-center text-sm text-emerald-700">{t('contact.submit.success')}</p>
+                      )}
+                      {submitState === 'error' && (
+                        <p className="text-center text-sm text-red-700">{t('contact.submit.error')}</p>
+                      )}
                     </div>
                   </form>
                 </div>
@@ -188,39 +249,6 @@ export function Contact() {
           </div>
         </section>
 
-        {/* Headquarters Section */}
-        <section className="pb-16 lg:pb-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center max-w-6xl mx-auto">
-              <AnimatedSection>
-                <div className="relative rounded-[2rem] overflow-hidden aspect-square md:aspect-[4/3] bg-pink/10 shadow-sm border border-black/5">
-                  <img
-                    src="/images/contact/headquarters.png"
-                    alt="Headquarters Map"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-              </AnimatedSection>
-
-              <AnimatedSection delay={0.2} className="flex flex-col justify-center">
-                <div className="mb-8">
-                  <img
-                    src="/images/logo.webp"
-                    alt="Logo"
-                    className="w-24 h-24 lg:w-28 lg:h-28 object-contain drop-shadow-sm"
-                  />
-                </div>
-                <h2 className="text-[#52171E] font-serif text-3xl lg:text-5xl uppercase leading-[1.1] mb-6">
-                  {t('contact.hq.main')}
-                </h2>
-                <div className="text-[#8B6E73] font-sans text-base md:text-lg space-y-1 leading-relaxed">
-                  <p>Sfax, Tunisia</p>
-                  <p>info@drdoudoudoubakes.com</p>
-                </div>
-              </AnimatedSection>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );

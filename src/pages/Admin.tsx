@@ -5,7 +5,7 @@ import type { Product, Category, Badge, GalleryItem } from '@/types';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Lock, LayoutDashboard,
   Package, Tags, Award, ShoppingBag, X, Save, ArrowLeft, BookOpen,
-  Image, ArrowUp, ArrowDown
+  Image, ArrowUp, ArrowDown, Inbox, MailOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRecipes } from '@/context/RecipeContext';
@@ -78,7 +78,7 @@ function PinGate({ onSuccess }: { onSuccess: () => void }) {
 
 // ── Tab Types ────────────────────────────────────────────────────────
 
-type Tab = 'products' | 'recipes' | 'categories' | 'badges' | 'orders' | 'gallery';
+type Tab = 'products' | 'recipes' | 'categories' | 'badges' | 'orders' | 'gallery' | 'inbox';
 
 // ── Modal ────────────────────────────────────────────────────────────
 
@@ -637,11 +637,12 @@ export function Admin() {
   const [galleryModalOpen, setGalleryModalOpen] = useState(false);
 
   const {
-    products, categories, badges, orders,
+    products, categories, badges, orders, contactMessages,
     addProduct, updateProduct, deleteProduct, togglePublish,
     addCategory, updateCategory, deleteCategory,
     addBadge, updateBadge, deleteBadge,
     updateOrderStatus, deleteOrder,
+    updateContactMessageStatus, deleteContactMessage,
   } = useProducts();
   
   const { recipes, addRecipe, updateRecipe, deleteRecipe } = useRecipes();
@@ -649,10 +650,16 @@ export function Admin() {
 
   if (!authenticated) return <PinGate onSuccess={() => setAuthenticated(true)} />;
 
+  const sortedContactMessages = [...contactMessages].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  const unreadContactMessages = contactMessages.filter(message => message.status === 'unread').length;
+
   const tabs: { key: Tab; label: string; icon: React.ElementType; count: number }[] = [
     { key: 'products', label: 'Products', icon: Package, count: products.length },
     { key: 'recipes', label: 'Recipes', icon: BookOpen, count: recipes.length },
     { key: 'gallery', label: 'Gallery', icon: Image, count: galleryItems.length },
+    { key: 'inbox', label: 'Inbox', icon: Inbox, count: unreadContactMessages },
     { key: 'categories', label: 'Categories', icon: Tags, count: categories.length },
     { key: 'badges', label: 'Badges', icon: Award, count: badges.length },
     { key: 'orders', label: 'Orders', icon: ShoppingBag, count: orders.length },
@@ -1161,6 +1168,100 @@ export function Admin() {
           )}
 
           {/* ── Orders Tab ─────────────────────────────────────────── */}
+          {activeTab === 'inbox' && (
+            <>
+              <div className="mb-8">
+                <h1 className="text-white font-serif text-2xl sm:text-3xl">Inbox</h1>
+                <p className="text-gray-400 text-sm mt-1">Read contact messages from the website forms</p>
+              </div>
+
+              {sortedContactMessages.length > 0 ? (
+                <div className="space-y-4">
+                  {sortedContactMessages.map(message => (
+                    <motion.article
+                      key={message.id}
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`bg-[#16213e] rounded-2xl border p-5 sm:p-6 transition-colors ${
+                        message.status === 'unread'
+                          ? 'border-amber-500/30 shadow-[0_0_0_1px_rgba(245,158,11,0.08)]'
+                          : 'border-white/5'
+                      }`}
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <h2 className="text-white font-serif text-xl">{message.name}</h2>
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                              message.status === 'unread'
+                                ? 'bg-amber-500/10 text-amber-400'
+                                : 'bg-emerald-500/10 text-emerald-400'
+                            }`}>
+                              {message.status === 'unread' ? 'Unread' : 'Read'}
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/5 text-gray-400 text-xs font-medium">
+                              {message.source === 'contact-page' ? 'Contact page' : 'Home page'}
+                            </span>
+                          </div>
+                          <p className="text-gray-500 text-xs">
+                            {new Date(message.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => updateContactMessageStatus(message.id, message.status === 'unread' ? 'read' : 'unread')}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors text-sm"
+                          >
+                            <MailOpen className="w-4 h-4" />
+                            {message.status === 'unread' ? 'Mark read' : 'Mark unread'}
+                          </button>
+                          <button
+                            onClick={() => { if (confirm('Delete this message?')) deleteContactMessage(message.id); }}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 text-red-300 hover:text-red-200 hover:bg-red-500/20 transition-colors text-sm"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                        <a
+                          href={`tel:${message.phone}`}
+                          className="rounded-xl bg-[#0f3460]/60 border border-white/5 px-4 py-3 text-sm text-gray-300 hover:text-white transition-colors"
+                        >
+                          <span className="block text-gray-500 text-xs mb-1">Phone</span>
+                          {message.phone}
+                        </a>
+                        <div className="rounded-xl bg-[#0f3460]/60 border border-white/5 px-4 py-3 text-sm text-gray-300">
+                          <span className="block text-gray-500 text-xs mb-1">Email</span>
+                          {message.email ? (
+                            <a href={`mailto:${message.email}`} className="hover:text-white transition-colors">
+                              {message.email}
+                            </a>
+                          ) : (
+                            <span className="text-gray-500">Not provided</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 rounded-xl bg-black/10 border border-white/5 p-4">
+                        <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{message.message}</p>
+                      </div>
+                    </motion.article>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[#16213e] rounded-2xl border border-white/5 text-center py-16 text-gray-500">
+                  <Inbox className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No messages yet. Contact form submissions will appear here.</p>
+                </div>
+              )}
+            </>
+          )}
+
           {activeTab === 'orders' && (
             <>
               <div className="mb-8">
