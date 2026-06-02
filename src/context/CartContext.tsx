@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { normalizeImageFields } from '@/lib/imagePaths';
 import type { CartItem, Product } from '@/types';
 
 // ── Storage ──────────────────────────────────────────────────────────
@@ -8,7 +9,12 @@ const CART_KEY = 'ddb_cart';
 function loadCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    if (raw) return JSON.parse(raw) as CartItem[];
+    if (raw) {
+      return (JSON.parse(raw) as CartItem[]).map(item => ({
+        ...item,
+        product: normalizeImageFields(item.product),
+      }));
+    }
   } catch { /* ignore */ }
   return [];
 }
@@ -146,16 +152,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 
   const addToCart = useCallback((product: Product, quantity = 1) => {
+    const normalizedProduct = normalizeImageFields(product);
     setItems(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
+      const existing = prev.find(item => item.product.id === normalizedProduct.id);
       if (existing) {
         return prev.map(item =>
-          item.product.id === product.id
+          item.product.id === normalizedProduct.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product: normalizedProduct, quantity }];
     });
     setIsCartOpen(true);
   }, []);

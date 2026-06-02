@@ -4,6 +4,7 @@ import {
   getDocs, writeBatch,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { normalizeImageFields } from '@/lib/imagePaths';
 import type { Product, Category, Badge, Order, ContactMessage, ContactMessageStatus } from '@/types';
 
 // ── Seed Data (used only on first-time setup if Firestore is empty) ──
@@ -37,7 +38,7 @@ const SEED_PRODUCTS: Product[] = [
     slug: 'Tiramisu Style Cheesecake',
     description: 'Our chef-crafted snacks and mini desserts deliver exceptional flavor and shelf appeal in a single-serving size. Rich Belgian chocolate with a fudgy center.',
     price: 35.00,
-    image: '/images/desserts/Tiramisu-Cheesecak.png',
+    image: '/images/desserts/Tiramisu-Cheesecak.webp',
     categoryId: 'cat-3',
     badgeIds: ['bdg-2', 'bdg-5'],
     ingredients: 'Belgian chocolate (cocoa mass, sugar, cocoa butter, soy lecithin), butter, free-range eggs, wheat flour, vanilla extract, sea salt flakes.',
@@ -51,7 +52,7 @@ const SEED_PRODUCTS: Product[] = [
     slug: 'chocolate cheesecake',
     description: 'Retail-ready classic bakery items in convenient packaging, perfectly portioned, and available in a range of sizes. A traditional Tunisian delight with almonds.',
     price: 5.5,
-    image: '/images/desserts/Chocolate-Cheesecake.png',
+    image: '/images/desserts/Chocolate-Cheesecake.webp',
     categoryId: 'cat-3',
     badgeIds: ['bdg-1', 'bdg-5'],
     ingredients: 'Almonds, sugar, rose water, semolina, butter, orange blossom water, honey, powdered sugar',
@@ -65,7 +66,7 @@ const SEED_PRODUCTS: Product[] = [
     slug: 'Speculoos Cheesecake',
     description: 'Visually stunning, scratch-made multi-layer bar cakes, round cakes, molten, and gluten-free cakes crafted to perfection by our master pastry chefs.',
     price: 5.5,
-    image: '/images/desserts/Speculoos-Cheesecake.png',
+    image: '/images/desserts/Speculoos-Cheesecake.webp',
     categoryId: 'cat-3',
     badgeIds: ['bdg-2', 'bdg-5'],
     ingredients: 'Wheat flour, butter, sugar, eggs, Madagascar vanilla, cream cheese, heavy cream, fresh strawberries, white chocolate',
@@ -79,7 +80,7 @@ const SEED_PRODUCTS: Product[] = [
     slug: 'Strawberry Cheesecake',
     description: 'A premium collection of dessert bars and brownies with our signature layering capabilities, ideal for on-the-go formats. Buttery shortcrust meets rich chocolate.',
     price: 6.00,
-    image: '/images/desserts/Strawberry-Cheesecake.png',
+    image: '/images/desserts/Strawberry-Cheesecake.webp',
     categoryId: 'cat-2',
     badgeIds: ['bdg-5'],
     ingredients: 'Dark chocolate, butter, eggs, sugar, wheat flour, cocoa powder, vanilla extract, sea salt, walnut pieces',
@@ -158,6 +159,16 @@ function saveToStorage<T>(key: string, data: T) {
   } catch { /* storage full */ }
 }
 
+function normalizeOrderImages(order: Order): Order {
+  return {
+    ...order,
+    items: order.items.map(item => ({
+      ...item,
+      product: normalizeImageFields(item.product),
+    })),
+  };
+}
+
 // ── Context ──────────────────────────────────────────────────────────
 
 interface ProductContextType {
@@ -203,7 +214,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   const useFirestore = isFirebaseConfigured();
 
   const [products, setProducts] = useState<Product[]>(() =>
-    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.products, SEED_PRODUCTS)
+    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.products, SEED_PRODUCTS).map(normalizeImageFields)
   );
   const [categories, setCategories] = useState<Category[]>(() =>
     useFirestore ? [] : loadFromStorage(STORAGE_KEYS.categories, SEED_CATEGORIES)
@@ -212,7 +223,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     useFirestore ? [] : loadFromStorage(STORAGE_KEYS.badges, SEED_BADGES)
   );
   const [orders, setOrders] = useState<Order[]>(() =>
-    useFirestore ? [] : loadFromStorage(STORAGE_KEYS.orders, [])
+    useFirestore ? [] : loadFromStorage<Order[]>(STORAGE_KEYS.orders, []).map(normalizeOrderImages)
   );
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>(() =>
     useFirestore ? [] : loadFromStorage(STORAGE_KEYS.contactMessages, [])
@@ -242,13 +253,13 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     unsubs.push(
       onSnapshot(productsCol(), (snap) => {
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
+        const data = snap.docs.map(d => normalizeImageFields({ id: d.id, ...d.data() } as Product));
         setProducts(data);
         setIsLoading(false);
       }, (err) => {
         console.error('Products snapshot error:', err);
         // Fallback to seed data if Firestore fails
-        setProducts(SEED_PRODUCTS);
+        setProducts(SEED_PRODUCTS.map(normalizeImageFields));
         setIsLoading(false);
       })
     );
@@ -269,7 +280,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     unsubs.push(
       onSnapshot(ordersCol(), (snap) => {
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Order));
+        const data = snap.docs.map(d => normalizeOrderImages({ id: d.id, ...d.data() } as Order));
         setOrders(data);
       }, () => setOrders([]))
     );
@@ -338,7 +349,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   // ── CRUD — Products ──────────────────────────────────────────────
   const addProduct = useCallback(async (product: Omit<Product, 'id' | 'createdAt'>) => {
-    const data = { ...product, createdAt: new Date().toISOString() };
+    const data = normalizeImageFields({ ...product, createdAt: new Date().toISOString() });
     if (useFirestore) {
       await addDoc(productsCol(), data);
     } else {
@@ -348,12 +359,13 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   }, [useFirestore]);
 
   const updateProduct = useCallback(async (id: string, updates: Partial<Product>) => {
+    const normalizedUpdates = normalizeImageFields(updates);
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = updates as Product;
+      const { id: _id, ...cleanUpdates } = normalizedUpdates as Product;
       void _id; // avoid unused warning
       await updateDoc(doc(db, 'products', id), cleanUpdates);
     } else {
-      setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
+      setProducts(prev => prev.map(p => (p.id === id ? normalizeImageFields({ ...p, ...normalizedUpdates }) : p)));
     }
   }, [useFirestore]);
 
@@ -435,11 +447,12 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   // ── Orders ───────────────────────────────────────────────────────
   const addOrder = useCallback(async (order: Order) => {
+    const normalizedOrder = normalizeOrderImages(order);
     if (useFirestore) {
-      const { id, ...data } = order;
+      const { id, ...data } = normalizedOrder;
       await addDoc(ordersCol(), { ...data, orderId: id });
     } else {
-      setOrders(prev => [...prev, order]);
+      setOrders(prev => [...prev, normalizedOrder]);
     }
   }, [useFirestore]);
 

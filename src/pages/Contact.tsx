@@ -54,7 +54,7 @@ export function Contact() {
             className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
           >
             <img
-              src="/images/desserts/chocolate-mixing.jpg"
+              src="/images/desserts/chocolate-mixing.webp"
               alt="Contact us"
               className="w-full h-full object-cover"
             />

@@ -182,7 +182,7 @@ export function Retail() {
 
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { image: '/images/desserts/seasonal-pie.jpg', title: 'Seasonal Pies' },
+              { image: '/images/desserts/tart.webp', title: 'Seasonal Pies' },
               { image: '/images/desserts/premium-cake.webp', title: 'Premium Cakes' },
               { image: '/images/desserts/halwa.webp', title: 'Brownie Platters' },
             ].map((product, index) => (

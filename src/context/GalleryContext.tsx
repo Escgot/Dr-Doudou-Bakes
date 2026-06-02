@@ -4,6 +4,7 @@ import {
   getDocs, writeBatch,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { normalizeImageFields } from '@/lib/imagePaths';
 import type { GalleryItem } from '@/types';
 
 // ── Seed Data ────────────────────────────────────────────────────────
@@ -121,7 +122,7 @@ const SEED_GALLERY: GalleryItem[] = [
   },
   {
     id: 'gal-11',
-    image: '/images/desserts/fruit-tart.jpg',
+    image: '/images/desserts/tart.webp',
     titleEN: 'FRUIT TARTS',
     titleFR: 'TARTES AUX FRUITS',
     titleAR: 'تارت الفواكه',
@@ -204,7 +205,7 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
   const useFirestore = isFirebaseConfigured();
 
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() =>
-    useFirestore ? [] : loadFromStorage(STORAGE_KEY, SEED_GALLERY)
+    useFirestore ? [] : loadFromStorage(STORAGE_KEY, SEED_GALLERY).map(normalizeImageFields)
   );
   const [isLoading, setIsLoading] = useState(useFirestore);
 
@@ -225,14 +226,14 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
       galleryCol(),
       (snap) => {
         const data = snap.docs
-          .map(d => ({ id: d.id, ...d.data() } as GalleryItem))
+          .map(d => normalizeImageFields({ id: d.id, ...d.data() } as GalleryItem))
           .sort((a, b) => a.sortOrder - b.sortOrder);
         setGalleryItems(data);
         setIsLoading(false);
       },
       (err) => {
         console.error('Gallery snapshot error:', err);
-        setGalleryItems(SEED_GALLERY);
+        setGalleryItems(SEED_GALLERY.map(normalizeImageFields));
         setIsLoading(false);
       }
     );
@@ -248,22 +249,24 @@ export function GalleryProvider({ children }: { children: React.ReactNode }) {
 
   // ── CRUD ───────────────────────────────────────────────────────
   const addGalleryItem = useCallback(async (item: Omit<GalleryItem, 'id'>) => {
+    const data = normalizeImageFields(item);
     if (useFirestore) {
-      await addDoc(galleryCol(), item);
+      await addDoc(galleryCol(), data);
     } else {
       const id = `gal-${Date.now().toString(36)}`;
-      setGalleryItems(prev => [...prev, { ...item, id }].sort((a, b) => a.sortOrder - b.sortOrder));
+      setGalleryItems(prev => [...prev, { ...data, id }].sort((a, b) => a.sortOrder - b.sortOrder));
     }
   }, [useFirestore]);
 
   const updateGalleryItem = useCallback(async (id: string, updates: Partial<GalleryItem>) => {
+    const normalizedUpdates = normalizeImageFields(updates);
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = updates as GalleryItem;
+      const { id: _id, ...cleanUpdates } = normalizedUpdates as GalleryItem;
       void _id;
       await updateDoc(doc(db, 'gallery', id), cleanUpdates);
     } else {
       setGalleryItems(prev =>
-        prev.map(g => (g.id === id ? { ...g, ...updates } : g)).sort((a, b) => a.sortOrder - b.sortOrder)
+        prev.map(g => (g.id === id ? normalizeImageFields({ ...g, ...normalizedUpdates }) : g)).sort((a, b) => a.sortOrder - b.sortOrder)
       );
     }
   }, [useFirestore]);

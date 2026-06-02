@@ -13,7 +13,7 @@ export function Shop() {
   const { categories, getProductsByCategory, getBadgesForProduct } = useProducts();
   const { addToCart, isInCart } = useCart();
   const [activeCategory, setActiveCategory] = useState('cat-1');
-  
+
   // Animation state for tracking which product was just added to cart
   const [addedItemIds, setAddedItemIds] = useState<Set<string>>(new Set());
 
@@ -22,9 +22,9 @@ export function Shop() {
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault(); // Prevent triggering link
     e.stopPropagation();
-    
+
     addToCart(product);
-    
+
     // Show checkmark animation temporarily
     setAddedItemIds(prev => new Set(prev).add(product.id));
     setTimeout(() => {
@@ -48,7 +48,7 @@ export function Shop() {
             className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden aspect-[4/3] md:aspect-video shadow-[0_25px_60px_rgba(0,0,0,0.4)] z-20 -mb-20 sm:-mb-28 lg:-mb-36 translate-y-10 sm:translate-y-16 lg:translate-y-24"
           >
             <img
-              src="/images/desserts/tart.png"
+              src="/images/desserts/tart.webp"
               alt="Shop Online"
               className="w-full h-full object-cover"
             />
@@ -74,7 +74,7 @@ export function Shop() {
       {/* Categories & Products */}
       <section className="bg-[#FEF6ED] pt-32 sm:pt-44 lg:pt-64 pb-16 lg:py-24 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Categories Navigation */}
           <AnimatedSection className="mb-12">
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
@@ -82,11 +82,10 @@ export function Shop() {
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 ${
-                    activeCategory === category.id
+                  className={`px-4 py-1.5 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 ${activeCategory === category.id
                       ? 'bg-pink text-white shadow-lg scale-105'
                       : 'bg-white text-primary border border-pink/20 hover:border-pink hover:bg-pink/5'
-                  }`}
+                    }`}
                 >
                   {category.name}
                 </button>
@@ -120,7 +119,7 @@ export function Shop() {
                           style={{ backgroundImage: `url('${product.image}')` }}
                         />
                         <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
-                        
+
                         {/* Badges */}
                         <div className="absolute top-4 left-4 flex flex-col gap-2">
                           {badges.map(badge => (
@@ -133,7 +132,7 @@ export function Shop() {
                             </span>
                           ))}
                         </div>
-                        
+
                         {/* Interactive overlay element */}
                         <div className="absolute inset-0 bg-pink/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                           <span className="text-white font-medium tracking-wider flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
@@ -154,17 +153,16 @@ export function Shop() {
                         <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1 line-clamp-3">
                           {product.description}
                         </p>
-                        
+
                         {/* Quick Add Button */}
                         <button
                           onClick={(e) => handleAddToCart(e, product)}
-                          className={`w-full py-3 rounded-xl font-medium tracking-wide flex items-center justify-center gap-2 transition-all duration-300 ${
-                            isAdded
+                          className={`w-full py-3 rounded-xl font-medium tracking-wide flex items-center justify-center gap-2 transition-all duration-300 ${isAdded
                               ? 'bg-emerald-600 text-white'
                               : inCart
-                              ? 'bg-secondary text-primary border border-pink/20 hover:bg-pink hover:text-white'
-                              : 'bg-pink text-white hover:bg-pink-dark'
-                          }`}
+                                ? 'bg-secondary text-primary border border-pink/20 hover:bg-pink hover:text-white'
+                                : 'bg-pink text-white hover:bg-pink-dark'
+                            }`}
                         >
                           {isAdded ? (
                             <><Check className="w-4 h-4" /> Added!</>
@@ -179,7 +177,7 @@ export function Shop() {
               })}
             </AnimatePresence>
           </motion.div>
-          
+
           {displayedProducts.length === 0 && (
             <div className="text-center py-20">
               <p className="text-primary/60 font-serif text-xl">No products found in this category.</p>

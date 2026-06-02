@@ -44,7 +44,7 @@ export function Careers() {
             className="relative rounded-[2rem] overflow-hidden aspect-video shadow-2xl z-20 -mb-24 lg:-mb-32 translate-y-12 lg:translate-y-20"
           >
             <img
-              src="/images/desserts/culinary-artistry.jpg"
+              src="/images/desserts/chocolate-mixing.webp"
               alt="Dessert team at work"
               className="w-full h-full object-cover"
             />

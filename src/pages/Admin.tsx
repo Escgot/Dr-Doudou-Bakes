@@ -194,7 +194,7 @@ function ProductForm({
       </div>
       <div>
         <label className={labelClass}>Image Path / URL</label>
-        <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} placeholder="/images/desserts/example.jpg" />
+        <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} placeholder="/images/desserts/example.webp" />
         {image && (
           <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-white/10">
             <img src={image} alt="preview" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
@@ -548,7 +548,7 @@ function GalleryItemForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Image Path / URL *</label>
-          <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} required placeholder="/images/desserts/example.jpg" />
+          <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} required placeholder="/images/desserts/example.webp" />
           {image && (
             <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-white/10">
               <img src={image} alt="preview" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
