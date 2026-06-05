@@ -158,9 +158,8 @@ export function Checkout() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Email Address *</label>
+                      <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Email Address (Optional)</label>
                       <input
-                        required
                         type="email"
                         value={customer.email}
                         onChange={e => setCustomer({...customer, email: e.target.value})}
@@ -182,13 +181,12 @@ export function Checkout() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Delivery Address *</label>
+                      <label className="text-primary text-xs font-medium tracking-wider mb-2 block">Notes (Optional)</label>
                       <textarea
-                        required
                         rows={3}
                         value={customer.address}
                         onChange={e => setCustomer({...customer, address: e.target.value})}
-                        placeholder="Street address, apartment, suite, etc."
+                        placeholder="Any special requests or instructions..."
                         className="w-full px-4 py-3 bg-cream/30 border border-primary/20 rounded-xl text-primary text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all resize-none"
                       />
                     </div>

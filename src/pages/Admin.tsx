@@ -5,7 +5,7 @@ import type { Product, Category, Badge, GalleryItem } from '@/types';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Lock, LayoutDashboard,
   Package, Tags, Award, ShoppingBag, X, Save, ArrowLeft, BookOpen,
-  Image, ArrowUp, ArrowDown, Inbox, MailOpen
+  Image, ArrowUp, ArrowDown, Inbox, MailOpen, MapPin
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRecipes } from '@/context/RecipeContext';
@@ -1290,8 +1290,15 @@ export function Admin() {
                           <td className="px-6 py-4">
                             <p className="text-white text-sm font-medium">{order.customer.name}</p>
                             <p className="text-gray-400 text-xs mt-1">{order.customer.phone}</p>
-                            <p className="text-gray-400 text-xs">{order.customer.email}</p>
-                            <p className="text-gray-500 text-xs mt-2 line-clamp-2" title={order.customer.address}>{order.customer.address}</p>
+                            {order.customer.email && <p className="text-gray-400 text-xs">{order.customer.email}</p>}
+                            <p className="text-gray-300 text-xs mt-2 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" /> {order.customer.region === 'sfax' ? 'Sfax' : order.customer.region === 'monastir' ? 'Monastir' : order.customer.region}
+                            </p>
+                            {order.customer.address && (
+                              <p className="text-gray-500 text-xs mt-1 line-clamp-2" title={order.customer.address}>
+                                <span className="text-gray-400">Notes:</span> {order.customer.address}
+                              </p>
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <div className="space-y-1 max-h-24 overflow-y-auto pr-2 custom-scrollbar">
