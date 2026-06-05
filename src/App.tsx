@@ -13,7 +13,7 @@ import { CartDrawer } from './components/shared/CartDrawer';
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
 const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })));
 const OurDesserts = lazy(() => import('./pages/OurDesserts').then(m => ({ default: m.OurDesserts })));
-const Foodservice = lazy(() => import('./pages/Foodservice').then(m => ({ default: m.Foodservice })));
+
 const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
 const Recipes = lazy(() => import('./pages/Recipes').then(m => ({ default: m.Recipes })));
 const RecipeDetail = lazy(() => import('./pages/RecipeDetail').then(m => ({ default: m.RecipeDetail })));
@@ -56,7 +56,7 @@ function App() {
                     <Route path="/order-confirmation" element={<OrderConfirmation />} />
                     <Route path="/recipes" element={<Recipes />} />
                     <Route path="/recipes/:id" element={<RecipeDetail />} />
-                    <Route path="/foodservice" element={<Foodservice />} />
+
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/admin" element={<Admin />} />
                   </Routes>

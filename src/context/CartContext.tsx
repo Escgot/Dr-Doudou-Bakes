@@ -58,7 +58,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // ── Provider ─────────────────────────────────────────────────────────
 
 export const DELIVERY_REGIONS = [
-  { id: 'monastir', label: 'Monastir', price: 3 },
+  { id: 'monastir', label: 'Livraison à domicile (Monastir)', price: 3 },
+  { id: 'monastir-pickup', label: "Pick-up Monastir (devant l'association Voix de l'Enfant / Marine Nationale)", price: 0 },
   { id: 'sfax-zone-1', label: 'Sfax (Route de Tunis / Route de Mahdia / Nassria)', price: 5 },
   { id: 'sfax-zone-2', label: 'Sfax (Bouacida / Kaaniche)', price: 1 }
 ];

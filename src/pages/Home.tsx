@@ -419,7 +419,7 @@ function FAQSection() {
     },
     {
       q: "Where do you deliver?",
-      a: "Currently, we offer hand-delivery within the Sfax greater area. We ensure all our desserts arrive in perfect condition using our temperature-controlled vehicles."
+      a: "Currently, we offer hand-delivery within the Sfax greater area and Monastir. We ensure all our desserts arrive in perfect condition using our temperature-controlled vehicles."
     },
     {
       q: "How should I store my desserts?",

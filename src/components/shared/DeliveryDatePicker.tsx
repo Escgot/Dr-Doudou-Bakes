@@ -209,7 +209,7 @@ export function DeliveryDatePicker({
       <div className="bg-amber-50 p-4 border-t border-amber-100 flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-amber-800 leading-relaxed">
-          We currently deliver within the Sfax greater area. For special orders or locations outside our standard zone, please contact us directly. We do not deliver on Sundays.
+          We currently deliver within the Sfax greater area and Monastir. For special orders or locations outside our standard zone, please contact us directly. We do not deliver on Sundays.
         </p>
       </div>
     </div>

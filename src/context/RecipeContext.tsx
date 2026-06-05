@@ -1,5 +1,48 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import {
+  collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc,
+  getDocs, writeBatch,
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Recipe } from '@/types';
+
+// ── Check if Firebase is configured ──────────────────────────────────
+function isFirebaseConfigured(): boolean {
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+  return !!projectId && projectId !== 'your-project-id';
+}
+
+// ── Firestore helpers ────────────────────────────────────────────────
+const recipesCol = () => collection(db, 'recipes');
+
+async function seedRecipes(seedData: Recipe[]) {
+  const snap = await getDocs(recipesCol());
+  if (snap.empty) {
+    const batch = writeBatch(db);
+    for (const item of seedData) {
+      const { id, ...data } = item;
+      batch.set(doc(recipesCol(), id), data);
+    }
+    await batch.commit();
+  }
+}
+
+// ── localStorage fallback ────────────────────────────────────────────
+const STORAGE_KEY = 'ddb_recipes';
+
+function loadFromStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw) as T;
+  } catch { /* corrupt data, use fallback */ }
+  return fallback;
+}
+
+function saveToStorage<T>(key: string, data: T) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch { /* storage full */ }
+}
 
 // Initial combined recipes data
 const INITIAL_RECIPES: Recipe[] = [
@@ -39,26 +82,26 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Dacquoise: Mix hazelnuts, icing sugar, almonds, flour, and baking powder. Whisk egg whites for 5 minutes, add sugar in 3 parts, then gently fold in dry mix. Divide and bake for 15 mins at 180°C.',
-          'Chocolate Genoise: Whisk eggs and sugar until pale. Gently fold in flour and cocoa. Bake for 10 mins at 180°C.',
-          'Ganache: Heat milk and butter (don\'t boil), pour over chocolate. Mix in a water bath until smooth, then freeze for 2 hours.',
-          'Mousseline Cream: Prepare pastry cream with milk, sugar and powder until thick. Let cool. Add butter in 3 parts, then hazelnut paste and hazelnuts.',
-          'Cream Assembly: Fold half of the ganache into the mousseline. In the other half, add 2 tbsp of mousseline to lighten it.',
-          'Montage: Hazelnut dacquoise, Mousseline cream, Soaked chocolate genoise, Mousseline cream, Second hazelnut dacquoise.',
-          'Finishing: Fully cover with hazelnut chocolate ganache.',
-          'Decoration: Decorate according to your style: hazelnuts, chocolate, shards, or mirror effect.'
+          "Dacquoise: Mix hazelnuts, icing sugar, almonds, flour, and baking powder. Whisk egg whites for 5 minutes, add sugar in 3 parts, then gently fold in dry mix. Divide and bake for 15 mins at 180°C.",
+          "Chocolate Genoise: Whisk eggs and sugar until pale. Gently fold in flour and cocoa. Bake for 10 mins at 180°C.",
+          "Ganache: Heat milk and butter (don't boil), pour over chocolate. Mix in a water bath until smooth, then freeze for 2 hours.",
+          "Mousseline Cream: Prepare pastry cream with milk, sugar and powder until thick. Let cool. Add butter in 3 parts, then hazelnut paste and hazelnuts.",
+          "Cream Assembly: Fold half of the ganache into the mousseline. In the other half, add 2 tbsp of mousseline to lighten it.",
+          "Montage: Hazelnut dacquoise, Mousseline cream, Soaked chocolate genoise, Mousseline cream, Second hazelnut dacquoise.",
+          "Finishing: Fully cover with hazelnut chocolate ganache.",
+          "Decoration: Decorate according to your style: hazelnuts, chocolate, shards, or mirror effect."
         ]
       },
       FR: {
         title: 'Entremets Noisette & Chocolat',
-        description: 'Une alliance luxueuse de dacquoise noisette, génoise cacao et crème mousseline onctueuse pour les grandes occasions.',
+        description: "Une alliance luxueuse de dacquoise noisette, génoise cacao et crème mousseline onctueuse pour les grandes occasions.",
         category: 'Entremets',
         tags: ['Chocolat', 'Noisette'],
-        quote: 'ولَعلَّ ما تَخشاهُ لَيسَ بِكائنٍ.. ولعلَّ ما تَرجوهُ سَوفَ يَكونُ\n ولعلَّ ما هَوَّنتَ لَيس بِهَيّنٍ.. ولعلَّ ما شدّدتَ سَوفَ يَهونُ',
+        quote: 'ولَعلَّ ما تَخشاهُ لَيسَ بِكائنٍ.. ولعلَّ ما تَرجوهُ سَوفَ يَكونُ\n ولعلَّ ما هَوَّنتَ لَيس بِهَيّنٍ.. ولعلَّ ما شدّدتَ سَوفَ يَهونُ',
         ingredientGroups: [
           {
             title: 'Dacquoise Noisette (x2)',
-            items: ['150 g noisettes moulues', '150 g sucre glace', '50 g amandes moulues', '40 g farine', '5 g levure chimique', '6 blancs d’œufs', '100 g sucre']
+            items: ['150 g noisettes moulues', '150 g sucre glace', '50 g amandes moulues', '40 g farine', '5 g levure chimique', "6 blancs d'œufs", '100 g sucre']
           },
           {
             title: 'Génoise Chocolat',
@@ -78,14 +121,14 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Dacquoise : Mélanger noisettes, sucre glace, amandes, farine et levure. Monter les blancs en neige pendant 5 minutes, ajouter le sucre en 3 fois, puis incorporer délicatement le mélange sec. Diviser en deux et cuire chaque disque 15 min à 180°C.',
-          'Génoise Chocolat : Fouetter les œufs et le sucre jusqu’à blanchiment. Ajouter farine et cacao délicatement. Cuire 10 min à 180°C.',
-          'Ganache : Chauffer le lait et le beurre (sans bouillir), verser sur le chocolat. Mélanger au bain-marie jusqu’à texture lisse, puis placer 2h au congélateur.',
-          'Crème Mousseline : Préparer la crème pâtissière avec lait, sucre et poudre jusqu’à épaississement. Laisser refroidir. Ajouter le beurre en 3 fois, puis la pâte de noisettes et les noisettes.',
-          'Assemblage des crèmes : Incorporer la moitié de la ganache dans la mousseline. Dans l’autre moitié de ganache, ajouter 2 c.à.s de mousseline pour l’alléger.',
-          'Montage : Dacquoise noisette, Crème mousseline, Génoise chocolat imbibée (lait), Crème mousseline, Deuxième dacquoise.',
-          'Finition : Recouvrir entièrement avec la ganache chocolat noisette.',
-          'Décoration : Décorer selon votre style : noisettes, chocolat, éclats ou effet miroir.'
+          "Dacquoise : Mélanger noisettes, sucre glace, amandes, farine et levure. Monter les blancs en neige pendant 5 minutes, ajouter le sucre en 3 fois, puis incorporer délicatement le mélange sec. Diviser en deux et cuire chaque disque 15 min à 180°C.",
+          "Génoise Chocolat : Fouetter les œufs et le sucre jusqu'à blanchiment. Ajouter farine et cacao délicatement. Cuire 10 min à 180°C.",
+          "Ganache : Chauffer le lait et le beurre (sans bouillir), verser sur le chocolat. Mélanger au bain-marie jusqu'à texture lisse, puis placer 2h au congélateur.",
+          "Crème Mousseline : Préparer la crème pâtissière avec lait, sucre et poudre jusqu'à épaississement. Laisser refroidir. Ajouter le beurre en 3 fois, puis la pâte de noisettes et les noisettes.",
+          "Assemblage des crèmes : Incorporer la moitié de la ganache dans la mousseline. Dans l'autre moitié de ganache, ajouter 2 c.à.s de mousseline pour l'alléger.",
+          "Montage : Dacquoise noisette, Crème mousseline, Génoise chocolat imbibée (lait), Crème mousseline, Deuxième dacquoise.",
+          "Finition : Recouvrir entièrement avec la ganache chocolat noisette.",
+          "Décoration : Décorer selon votre style : noisettes, chocolat, éclats ou effet miroir."
         ]
       },
       AR: {
@@ -93,7 +136,7 @@ const INITIAL_RECIPES: Recipe[] = [
         description: 'تحالف فاخر من داكواز البندق، جينواز الكاكاو، وكريم موسلين ناعم للمناسبات الكبرى.',
         category: 'Entremets',
         tags: ['شوكولاتة', 'بندق'],
-        quote: 'ولَعلَّ ما تَخشاهُ لَيسَ بِكائنٍ.. ولعلَّ ما تَرجوهُ سَوفَ يَكونُ\n ولعلَّ ما هَوَّنتَ لَيس بِهَيّنٍ.. ولعلَّ ما شدّدتَ سَوفَ يَهونُ',
+        quote: 'ولَعلَّ ما تَخشاهُ لَيسَ بِكائنٍ.. ولعلَّ ما تَرجوهُ سَوفَ يَكونُ\n ولعلَّ ما هَوَّنتَ لَيس بِهَيّنٍ.. ولعلَّ ما شدّدتَ سَوفَ يَهونُ',
         ingredientGroups: [
           {
             title: 'داكواز البندق (x2)',
@@ -157,31 +200,31 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Dacquoise: Mix pistachios, almonds, flour, icing sugar and powder.',
-          'Whisk whites for 5 minutes, add sugar in 3 parts until firm meringue.',
-          'Gently fold in dry mix in 3 parts.',
-          'Divide into 3 equal parts and spread in 20cm molds.',
-          'Bake for 15 mins at 180°C, let cool completely.',
-          'Mousseline: Prepare pastry cream with milk, sugar and powder until thick.',
-          'Let cool completely, then whisk for 5 minutes.',
-          'Add soft butter and beat until smooth and creamy.',
-          'Fold in pistachio paste, pistachios, syrup and coloring.',
-          'Montage: In a frame or mold: Dacquoise, cream, dacquoise, cream, roasted pistachios, dacquoise.',
-          'Fully cover with the pistachio mousseline cream.',
-          'Decoration: Decorate according to your style: pistachios, shards, or elegant finish.',
-          'Finish: Place in freezer for 1 hour before cutting.'
+          "Dacquoise: Mix pistachios, almonds, flour, icing sugar and powder.",
+          "Whisk whites for 5 minutes, add sugar in 3 parts until firm meringue.",
+          "Gently fold in dry mix in 3 parts.",
+          "Divide into 3 equal parts and spread in 20cm molds.",
+          "Bake for 15 mins at 180°C, let cool completely.",
+          "Mousseline: Prepare pastry cream with milk, sugar and powder until thick.",
+          "Let cool completely, then whisk for 5 minutes.",
+          "Add soft butter and beat until smooth and creamy.",
+          "Fold in pistachio paste, pistachios, syrup and coloring.",
+          "Montage: In a frame or mold: Dacquoise, cream, dacquoise, cream, roasted pistachios, dacquoise.",
+          "Fully cover with the pistachio mousseline cream.",
+          "Decoration: Decorate according to your style: pistachios, shards, or elegant finish.",
+          "Finish: Place in freezer for 1 hour before cutting."
         ]
       },
       FR: {
         title: 'Russe Pistache',
-        description: 'Un classique revisité composé de trois couches de dacquoise pistache et d’une crème mousseline onctueuse et parfumée.',
+        description: "Un classique revisité composé de trois couches de dacquoise pistache et d'une crème mousseline onctueuse et parfumée.",
         category: 'Entremets',
         tags: ['Pistache', 'Russe'],
         quote: 'الصمتُ في حَرَم الجمالِ جمالُ..',
         ingredientGroups: [
           {
             title: 'Dacquoise Pistache (x3)',
-            items: ['100 g pistaches moulues', '100 g amandes moulues', '40 g farine', '150 g sucre glace (tamisé)', '5 g levure pâtissière', '6 blancs d’œufs', '100 g sucre']
+            items: ['100 g pistaches moulues', '100 g amandes moulues', '40 g farine', '150 g sucre glace (tamisé)', '5 g levure pâtissière', "6 blancs d'œufs", '100 g sucre']
           },
           {
             title: 'Crème Mousseline Pistache',
@@ -193,19 +236,19 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Dacquoise : Mélanger pistaches, amandes, farine, sucre glace et levure.',
-          'Monter les blancs en neige pendant 5 minutes, puis ajouter le sucre en 3 fois jusqu’à obtenir une meringue ferme.',
-          'Incorporer le mélange sec en 3 fois délicatement (de bas en haut).',
-          'Diviser la pâte en 3 parts égales et étaler dans des moules de 20 cm.',
-          'Cuire 15 min à 180°C (four préchauffé), puis laisser refroidir complètement.',
-          'Crème Mousseline : Préparer la crème pâtissière avec lait, sucre et poudre jusqu’à épaississement.',
-          'Laisser refroidir complètement, puis fouetter 5 minutes.',
-          'Ajouter le beurre mou et battre jusqu’à texture lisse et onctueuse.',
-          'Incorporer la pâte de pistache, les pistaches, le sirop et le colorant.',
-          'Montage : Dans un cadre ou moule : Dacquoise, Crème mousseline, Dacquoise, Crème mousseline, Pistaches torréfiées, Dacquoise.',
-          'Recouvrir entièrement avec la crème mousseline.',
-          'Décoration : Décorer selon votre style : pistaches, éclats, ou finition élégante.',
-          'Finition : Placer au congélateur 1 heure avant découpe.',
+          "Dacquoise : Mélanger pistaches, amandes, farine, sucre glace et levure.",
+          "Monter les blancs en neige pendant 5 minutes, puis ajouter le sucre en 3 fois jusqu'à obtenir une meringue ferme.",
+          "Incorporer le mélange sec en 3 fois délicatement (de bas en haut).",
+          "Diviser la pâte en 3 parts égales et étaler dans des moules de 20 cm.",
+          "Cuire 15 min à 180°C (four préchauffé), puis laisser refroidir complètement.",
+          "Crème Mousseline : Préparer la crème pâtissière avec lait, sucre et poudre jusqu'à épaississement.",
+          "Laisser refroidir complètement, puis fouetter 5 minutes.",
+          "Ajouter le beurre mou et battre jusqu'à texture lisse et onctueuse.",
+          "Incorporer la pâte de pistache, les pistaches, le sirop et le colorant.",
+          "Montage : Dans un cadre ou moule : Dacquoise, Crème mousseline, Dacquoise, Crème mousseline, Pistaches torréfiées, Dacquoise.",
+          "Recouvrir entièrement avec la crème mousseline.",
+          "Décoration : Décorer selon votre style : pistaches, éclats, ou finition élégante.",
+          "Finition : Placer au congélateur 1 heure avant découpe."
         ]
       },
       AR: {
@@ -270,25 +313,25 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'In a bowl, mix powdered biscuits with ground almonds.',
-          'Add geranium water and sweetened condensed milk.',
-          'Mix until a homogeneous and malleable dough forms.',
-          'Form small regular balls with your hands.',
-          'Dip each ball in melted chocolate.',
-          'Decorate according to your style with nuts, chocolate or cereal.',
-          'Let rest until the chocolate hardens.'
+          "In a bowl, mix powdered biscuits with ground almonds.",
+          "Add geranium water and sweetened condensed milk.",
+          "Mix until a homogeneous and malleable dough forms.",
+          "Form small regular balls with your hands.",
+          "Dip each ball in melted chocolate.",
+          "Decorate according to your style with nuts, chocolate or cereal.",
+          "Let rest until the chocolate hardens."
         ]
       },
       FR: {
         title: 'Boulettes Biscuits & Amandes',
-        description: 'De délicieuses bouchées artisanales mêlant le croquant des amandes à la douceur de l’eau de géranium et du chocolat.',
+        description: "De délicieuses bouchées artisanales mêlant le croquant des amandes à la douceur de l'eau de géranium et du chocolat.",
         category: 'Traditional',
         tags: ['Authentique', 'Bouchées'],
-        quote: 'فَقَدْ تُورِقُ الأَشْجَارُ بَعْدَذُبُولِهَا.. وَيَخْضَرُّ سَاقُ النَّبْتِ وَهْوَ هَشِيمُ',
+        quote: 'فَقَدْ تُورِقُ الأَشْجَارُ بَعْدَذُبُولِهَا.. وَيَخْضَرُّ سَاقُ النَّبْتِ وَهْوَ هَشِيمُ',
         ingredientGroups: [
           {
             title: 'Boulettes Biscuits & Amandes',
-            items: ['2 tasses biscuits réduits en poudre', '1 tasse amandes moulues', '1/2 tasse eau de géranium', '1 c.à.s lait concentré sucré']
+            items: ['2 tasses biscuits réduits en poudre', '1 tasse amandes moulues', "1/2 tasse eau de géranium", '1 c.à.s lait concentré sucré']
           },
           {
             title: 'Enrobage & Décoration',
@@ -296,13 +339,13 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Dans un bol, mélanger les biscuits en poudre avec les amandes moulues.',
-          'Ajouter l’eau de géranium et le lait concentré sucré.',
-          'Mélanger jusqu’à obtenir une pâte homogène et malléable.',
-          'Former des petites boules régulières avec les mains.',
-          'Tremper chaque boule dans le chocolat fondu.',
-          'Décorer selon vos envies avec fruits secs, chocolat ou céréales.',
-          'Laisser reposer jusqu’à ce que le chocolat durcisse.'
+          "Dans un bol, mélanger les biscuits en poudre avec les amandes moulues.",
+          "Ajouter l'eau de géranium et le lait concentré sucré.",
+          "Mélanger jusqu'à obtenir une pâte homogène et malléable.",
+          "Former des petites boules régulières avec les mains.",
+          "Tremper chaque boule dans le chocolat fondu.",
+          "Décorer selon vos envies avec fruits secs, chocolat ou céréales.",
+          "Laisser reposer jusqu'à ce que le chocolat durcisse."
         ]
       },
       AR: {
@@ -310,7 +353,7 @@ const INITIAL_RECIPES: Recipe[] = [
         description: 'لقيمات حرفية لذيذة تمزج بين اللوز المقرمش وحلاوة ماء العطرشية والشوكولاتة.',
         category: 'Traditional',
         tags: ['أصيل', 'لقيمات'],
-        quote: 'فَقَدْ تُورِقُ الأَشْجَارُ بَعْدَذُبُولِهَا.. وَيَخْضَرُّ سَاقُ النَّبْتِ وَهْوَ هَشِيمُ',
+        quote: 'فَقَدْ تُورِقُ الأَشْجَارُ بَعْدَذُبُولِهَا.. وَيَخْضَرُّ سَاقُ النَّبْتِ وَهْوَ هَشِيمُ',
         ingredientGroups: [
           {
             title: 'عجينة البسكويت واللوز',
@@ -354,31 +397,27 @@ const INITIAL_RECIPES: Recipe[] = [
           {
             title: 'Chocolate Mousse',
             items: ['Chocolate mousse mix', '150ml milk (reduced for extra richness)']
-          },
-          {
-            title: 'Assembly',
-            items: ['Biscuits', 'Instant coffee + water (for soaking)', 'Crushed hazelnuts']
           }
         ],
         steps: [
-          'Mousseline: Mix pastry powder, milk and sugar in a pot. Thicken over heat.',
-          'Cover with plastic wrap directly on top and let cool completely.',
-          'Whisk cooled cream for 2 minutes.',
-          'Add soft butter/margarine and beat again.',
-          'Fold in hazelnut praliné and mix until silky and creamy.',
-          'Chocolate Mousse: Prepare with 150ml milk for extra thickness.',
-          'Assembly: Dip biscuits in coffee-water mixture.',
-          'In a mold: Soaked biscuits, praline mousseline, crushed hazelnuts, biscuits, chocolate mousse, biscuits, mousseline (finish).',
-          'Finishing: Smooth the top carefully.',
-          'Decoration: Decorate your style: hazelnuts, chocolate, cocoa powder or modern effect.'
+          "Mousseline: Mix pastry powder, milk and sugar in a pot. Thicken over heat.",
+          "Cover with plastic wrap directly on top and let cool completely.",
+          "Whisk cooled cream for 2 minutes.",
+          "Add soft butter/margarine and beat again.",
+          "Fold in hazelnut praliné and mix until silky and creamy.",
+          "Chocolate Mousse: Prepare with 150ml milk for extra thickness.",
+          "Assembly: Dip biscuits in coffee-water mixture.",
+          "In a mold: Soaked biscuits, praline mousseline, crushed hazelnuts, biscuits, chocolate mousse, biscuits, mousseline (finish).",
+          "Finishing: Smooth the top carefully.",
+          "Decoration: Decorate your style: hazelnuts, chocolate, cocoa powder or modern effect."
         ]
       },
       FR: {
         title: "Gâteau courant d'air noisettes chocolat",
-        description: 'Un dessert sans cuisson renversant, superposant une mousse chocolat intense et une mousseline praliné onctueuse.',
+        description: "Un dessert sans cuisson renversant, superposant une mousse chocolat intense et une mousseline praliné onctueuse.",
         category: 'Traditional',
         tags: ['Chocolat', 'Noisette', 'Sans Cuisson'],
-        quote: 'وَلعَلَّ مَا تخٔشَاهُ ليسَ بِكَائِنٍ.. وَلعَلَّ مَا ترْجُوهُ سَوْفَ يَكُونُ',
+        quote: 'وَلعَلَّ مَا تخٔشَاهُ ليسَ بِكَائِنٍ.. وَلعَلَّ مَا ترْجُوهُ سَوْفَ يَكُونُ',
         ingredientGroups: [
           {
             title: 'Crème Mousseline Praliné Noisettes',
@@ -386,7 +425,7 @@ const INITIAL_RECIPES: Recipe[] = [
           },
           {
             title: 'Mousse au Chocolat',
-            items: ['Préparation pour mousse au chocolat', '150 ml lait (au lieu de 200 ml pour plus d’onctuosité)']
+            items: ['Préparation pour mousse au chocolat', "150 ml lait (au lieu de 200 ml pour plus d'onctuosité)"]
           },
           {
             title: 'Montage',
@@ -394,16 +433,16 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Crème Mousseline : Dans une casserole, mélanger la poudre de crème pâtissière, le lait et le sucre. Faire épaissir.',
-          'Couvrir au contact avec du film alimentaire et laisser refroidir complètement.',
-          'Fouetter la crème refroidie pendant 2 minutes.',
-          'Ajouter la margarine (ou beurre mou) et battre à nouveau.',
-          'Incorporer le praliné noisettes (50 à 100 g selon intensité) et mixer jusqu’à obtenir une texture lisse et crémeuse.',
-          'Mousse au Chocolat : Préparer la mousse avec 150 ml de lait pour une texture plus épaisse et gourmande.',
-          'Montage : Tremper les biscuits dans un mélange eau + café instantané.',
-          'Dans un moule, réaliser les couches : Biscuits imbibés, Crème mousseline praliné, Noisettes concassées, Biscuits imbibés, Mousse au chocolat, Biscuits imbibés, Crème mousseline (finition).',
-          'Finition : Lisser le dessus soigneusement.',
-          'Décoration : Décorer selon votre style : noisettes, chocolat, poudre de cacao ou effet moderne.'
+          "Crème Mousseline : Dans une casserole, mélanger la poudre de crème pâtissière, le lait et le sucre. Faire épaissir.",
+          "Couvrir au contact avec du film alimentaire et laisser refroidir complètement.",
+          "Fouetter la crème refroidie pendant 2 minutes.",
+          "Ajouter la margarine (ou beurre mou) et battre à nouveau.",
+          "Incorporer le praliné noisettes (50 à 100 g selon intensité) et mixer jusqu'à obtenir une texture lisse et crémeuse.",
+          "Mousse au Chocolat : Préparer la mousse avec 150 ml de lait pour une texture plus épaisse et gourmande.",
+          "Montage : Tremper les biscuits dans un mélange eau + café instantané.",
+          "Dans un moule, réaliser les couches : Biscuits imbibés, Crème mousseline praliné, Noisettes concassées, Biscuits imbibés, Mousse au chocolat, Biscuits imbibés, Crème mousseline (finition).",
+          "Finition : Lisser le dessus soigneusement.",
+          "Décoration : Décorer selon votre style : noisettes, chocolat, poudre de cacao ou effet moderne."
         ]
       },
       AR: {
@@ -411,7 +450,7 @@ const INITIAL_RECIPES: Recipe[] = [
         description: 'تحلية مذهلة بدون خبز بطبقات من موس الشوكولاتة المكثف وموسلين براليني البندق الناعم.',
         category: 'Traditional',
         tags: ['شوكولاتة', 'بندق', 'بدون خبز'],
-        quote: 'وَلعَلَّ مَا تخٔشَاهُ ليسَ بِكَائِنٍ.. وَلعَلَّ مَا ترْجُوهُ سَوْفَ يَكُونُ',
+        quote: 'وَلعَلَّ مَا تخٔشَاهُ ليسَ بِكَائِنٍ.. وَلعَلَّ مَا ترْجُوهُ سَوْفَ يَكُونُ',
         ingredientGroups: [
           {
             title: 'كريم موسلين براليني البندق',
@@ -465,17 +504,17 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Mix flour, sugar, baking powder and vanillin sugar.',
-          'Add fat (margarine/butter) and crumble the dough with fingertips.',
-          'Incorporate eggs and mix until a homogeneous dough forms.',
-          'Wrap in plastic film and chill.',
-          'Let rest in fridge while preparing the fillings.',
-          'Pro Tip 🔥: Dip cooked "zouzas" in couverture chocolate for a rich finish.'
+          "Mix flour, sugar, baking powder and vanillin sugar.",
+          "Add fat (margarine/butter) and crumble the dough with fingertips.",
+          "Incorporate eggs and mix until a homogeneous dough forms.",
+          "Wrap in plastic film and chill.",
+          "Let rest in fridge while preparing the fillings.",
+          "Pro Tip 🔥: Dip cooked 'zouzas' in couverture chocolate for a rich finish."
         ]
       },
       FR: {
         title: 'Pâte Sablée',
-        description: 'Une base artisanale croustillante à sabler, déclinée en 5 parfums irrésistibles : Pistache, Noisette, Kinder, Snickers et Dubaï.',
+        description: "Une base artisanale croustillante à sabler, déclinée en 5 parfums irrésistibles : Pistache, Noisette, Kinder, Snickers et Dubaï.",
         category: 'Biscuits',
         tags: ['Authentique', 'Zouza'],
         quote: 'صنعت بحب.. ♡',
@@ -490,12 +529,12 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Mélanger la farine, le sucre, la levure chimique et le sucre vanilliné.',
-          'Ajouter la margarine (ou beurre froid) et sabler la pâte du bout des doigts.',
-          'Incorporer les œufs et mélanger jusqu’à obtenir une pâte homogène.',
-          'Envelopper la pâte dans du film alimentaire.',
-          'Laisser reposer au réfrigérateur pendant la préparation des farces.',
-          'Astuce 🤎: Trempez les zouzas déjà cuits dans du chocolat de couverture pour un effet brillant.'
+          "Mélanger la farine, le sucre, la levure chimique et le sucre vanilliné.",
+          "Ajouter la margarine (ou beurre froid) et sabler la pâte du bout des doigts.",
+          "Incorporer les œufs et mélanger jusqu'à obtenir une pâte homogène.",
+          "Envelopper la pâte dans du film alimentaire.",
+          "Laisser reposer au réfrigérateur pendant la préparation des farces.",
+          "Astuce 🤎: Trempez les zouzas déjà cuits dans du chocolat de couverture pour un effet brillant."
         ]
       },
       AR: {
@@ -549,26 +588,26 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Melt dark chocolate and butter until smooth.',
-          'In another bowl, whisk eggs, sugar and vanilla for 3 mins until pale.',
-          'Stir in the melted chocolate mixture.',
-          'Add dry ingredients: flour, cocoa, powder, salt. Mix until smooth.',
-          'Fold in the extra chocolate chunks.',
-          'Pour into mold, decorate with nuts and extra chunks.',
-          'Bake at 160°C for 20-30 minutes.',
-          'Cool completely before slicing.'
+          "Melt dark chocolate and butter until smooth.",
+          "In another bowl, whisk eggs, sugar and vanilla for 3 mins until pale.",
+          "Stir in the melted chocolate mixture.",
+          "Add dry ingredients: flour, cocoa, powder, salt. Mix until smooth.",
+          "Fold in the extra chocolate chunks.",
+          "Pour into mold, decorate with nuts and extra chunks.",
+          "Bake at 160°C for 20-30 minutes.",
+          "Cool completely before slicing."
         ]
       },
       FR: {
         title: 'Chocolate Brownie',
-        description: 'Brownie au chocolat riche et fondant avec des garnitures artisanales et une croûte parfaitement craquante.',
+        description: "Brownie au chocolat riche et fondant avec des garnitures artisanales et une croûte parfaitement craquante.",
         category: 'Brownies',
         tags: ['Chocolat', 'Fondant'],
         quote: 'Riche, fondant et préparé avec le meilleur cacao.',
         ingredientGroups: [
           {
             title: 'Base de Brownie',
-            items: ['1 tasse de chocolat noir', '1/4 tasse de beurre', '2 œufs', '1/2 tasse de sucre', '1 c.à.c d’extrait de vanille', '3/4 tasse de farine', '2 c.à.s de cacao en poudre', '1/4 c.à.c de levure chimique', 'Une pincée de sel', '≈ 50g de pépites de chocolat au lait']
+            items: ['1 tasse de chocolat noir', '1/4 tasse de beurre', '2 œufs', '1/2 tasse de sucre', "1 c.à.c d'extrait de vanille", '3/4 tasse de farine', '2 c.à.s de cacao en poudre', '1/4 c.à.c de levure chimique', 'Une pincée de sel', '≈ 50g de pépites de chocolat au lait']
           },
           {
             title: 'Garniture',
@@ -576,14 +615,14 @@ const INITIAL_RECIPES: Recipe[] = [
           }
         ],
         steps: [
-          'Faire fondre le chocolat noir avec le beurre jusqu’à obtenir un mélange lisse.',
-          'Dans un autre bol, battre les œufs, le sucre et la vanille pendant 3 mins jusqu’à blanchiment.',
-          'Ajouter le mélange chocolaté fondu et bien mélanger.',
-          'Ajouter farine, cacao, levure et sel. Mélanger jusqu’à texture lisse.',
-          'Incorporer les pépites de chocolat supplémentaires.',
-          'Verser dans le moule, décorer avec les noix et le chocolat.',
-          'Cuire à 160°C pendant 20-30 minutes.',
-          'Laisser refroidir complètement avant de couper.'
+          "Faire fondre le chocolat noir avec le beurre jusqu'à obtenir un mélange lisse.",
+          "Dans un autre bol, battre les œufs, le sucre et la vanille pendant 3 mins jusqu'à blanchiment.",
+          "Ajouter le mélange chocolaté fondu et bien mélanger.",
+          "Ajouter farine, cacao, levure et sel. Mélanger jusqu'à texture lisse.",
+          "Incorporer les pépites de chocolat supplémentaires.",
+          "Verser dans le moule, décorer avec les noix et le chocolat.",
+          "Cuire à 160°C pendant 20-30 minutes.",
+          "Laisser refroidir complètement avant de couper."
         ]
       },
       AR: {
@@ -617,8 +656,11 @@ const INITIAL_RECIPES: Recipe[] = [
   }
 ];
 
+// ── Context ──────────────────────────────────────────────────────────
+
 interface RecipeContextType {
   recipes: Recipe[];
+  isLoading: boolean;
   addRecipe: (recipe: Recipe) => void;
   updateRecipe: (id: string, updates: Partial<Recipe>) => void;
   deleteRecipe: (id: string) => void;
@@ -627,22 +669,82 @@ interface RecipeContextType {
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
 
 export function RecipeProvider({ children }: { children: ReactNode }) {
-  const [recipes, setRecipes] = useState<Recipe[]>(INITIAL_RECIPES);
+  const useFirestore = isFirebaseConfigured();
 
-  const addRecipe = (recipe: Recipe) => {
-    setRecipes(prev => [...prev, recipe]);
-  };
+  const [recipes, setRecipes] = useState<Recipe[]>(() =>
+    useFirestore ? [] : loadFromStorage(STORAGE_KEY, INITIAL_RECIPES)
+  );
+  const [isLoading, setIsLoading] = useState(useFirestore);
 
-  const updateRecipe = (id: string, updates: Partial<Recipe>) => {
-    setRecipes(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
-  };
+  // ── Firestore real-time listener ──────────────────────────────
+  useEffect(() => {
+    if (!useFirestore) return;
 
-  const deleteRecipe = (id: string) => {
-    setRecipes(prev => prev.filter(r => r.id !== id));
-  };
+    // Seed on first run (if empty)
+    const initSeed = async () => {
+      try {
+        await seedRecipes(INITIAL_RECIPES);
+      } catch (err) {
+        console.error('Firestore recipe seed error:', err);
+      }
+    };
+    initSeed();
+
+    // Real-time listener
+    const unsub = onSnapshot(
+      recipesCol(),
+      (snap) => {
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Recipe));
+        setRecipes(data);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('Recipes snapshot error:', err);
+        // Fallback to seed data if Firestore fails
+        setRecipes(INITIAL_RECIPES);
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsub();
+  }, [useFirestore]);
+
+  // ── localStorage persistence (fallback mode) ──────────────────
+  useEffect(() => {
+    if (useFirestore) return;
+    saveToStorage(STORAGE_KEY, recipes);
+  }, [recipes, useFirestore]);
+
+  // ── CRUD ───────────────────────────────────────────────────────
+  const addRecipe = useCallback(async (recipe: Recipe) => {
+    if (useFirestore) {
+      const { id, ...data } = recipe;
+      await addDoc(recipesCol(), { ...data, originalId: id });
+    } else {
+      setRecipes(prev => [...prev, recipe]);
+    }
+  }, [useFirestore]);
+
+  const updateRecipe = useCallback(async (id: string, updates: Partial<Recipe>) => {
+    if (useFirestore) {
+      const { id: _id, ...cleanUpdates } = updates as Recipe;
+      void _id;
+      await updateDoc(doc(db, 'recipes', id), cleanUpdates);
+    } else {
+      setRecipes(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+    }
+  }, [useFirestore]);
+
+  const deleteRecipe = useCallback(async (id: string) => {
+    if (useFirestore) {
+      await deleteDoc(doc(db, 'recipes', id));
+    } else {
+      setRecipes(prev => prev.filter(r => r.id !== id));
+    }
+  }, [useFirestore]);
 
   return (
-    <RecipeContext.Provider value={{ recipes, addRecipe, updateRecipe, deleteRecipe }}>
+    <RecipeContext.Provider value={{ recipes, isLoading, addRecipe, updateRecipe, deleteRecipe }}>
       {children}
     </RecipeContext.Provider>
   );
