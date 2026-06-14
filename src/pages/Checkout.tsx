@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, MapPin, Calendar, CreditCard, ShoppingBag } from 'lucide-react';
 import { useCart, DELIVERY_REGIONS } from '@/context/CartContext';
 import { useProducts } from '@/context/ProductContext';
+import { getDiscountedPrice, hasDiscount } from '@/lib/discount';
 import { DeliveryDatePicker } from '@/components/shared/DeliveryDatePicker';
 import { PaymentForm } from '@/components/shared/PaymentForm';
 import type { OrderCustomer } from '@/types';
@@ -265,7 +266,7 @@ export function Checkout() {
                     <div className="flex-1 flex flex-col justify-center">
                       <h4 className="text-primary text-sm font-medium line-clamp-1">{item.product.name}</h4>
                       <p className="text-muted-foreground text-xs">Qty: {item.quantity}</p>
-                      <p className="text-primary/80 text-sm font-medium mt-1">{(item.product.price * item.quantity).toFixed(2)} TND</p>
+                      <p className="text-primary/80 text-sm font-medium mt-1">{(getDiscountedPrice(item.product, item.quantity) * item.quantity).toFixed(2)} TND</p>
                     </div>
                   </div>
                 ))}

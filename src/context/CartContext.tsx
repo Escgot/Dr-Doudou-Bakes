@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { normalizeImageFields } from '@/lib/imagePaths';
+import { getDiscountedPrice } from '@/lib/discount';
 import type { CartItem, Product } from '@/types';
 
 // ── Storage ──────────────────────────────────────────────────────────
@@ -76,22 +77,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Derived
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const rawTotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const rawTotal = items.reduce((sum, item) => sum + getDiscountedPrice(item.product, item.quantity) * item.quantity, 0);
 
   // Promotion Engine
   let discount = 0;
   let hasFreeDelivery = false;
   const appliedOffers: string[] = [];
 
-  // Group items by category for processing
+  // Group items by category for processing (use discounted unit prices)
   const cheesecakes = items
     .filter(i => i.product.categoryId === 'cat-3')
-    .flatMap(i => Array(i.quantity).fill(i.product.price))
+    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity)))
     .sort((a, b) => b - a); // Sort descending to maximize discount for user
 
   const brownies = items
     .filter(i => i.product.categoryId === 'cat-4')
-    .flatMap(i => Array(i.quantity).fill(i.product.price))
+    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity)))
     .sort((a, b) => b - a);
 
   // Cheesecake Offer Logic: 7 for 38 (Free Del), then 4 for 20
@@ -144,6 +145,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       appliedOffers.push('4 Brownies for 10 TND');
     }
     brIndex += 4;
+  }
+
+  // Custom Product Free Delivery Logic
+  for (const item of items) {
+    if (item.product.freeDeliveryMinQuantity && item.quantity >= item.product.freeDeliveryMinQuantity) {
+      if (!hasFreeDelivery) {
+        hasFreeDelivery = true;
+        appliedOffers.push(`Free Delivery (from ${item.product.name})`);
+      }
+    }
   }
 
   // Final totals

@@ -1,6 +1,7 @@
 import { X, ShoppingBag, Plus, Minus, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { getDiscountedPrice, hasDiscount } from '@/lib/discount';
 import { Link, useNavigate } from 'react-router-dom';
 
 export function CartDrawer() {
@@ -93,7 +94,14 @@ export function CartDrawer() {
                               <X className="w-4 h-4" />
                             </button>
                           </div>
-                          <p className="text-primary/70 text-xs mt-1">{item.product.price.toFixed(2)} TND</p>
+                          {hasDiscount(item.product, item.quantity) ? (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-muted-foreground text-[10px] line-through">{item.product.price.toFixed(2)} TND</span>
+                              <span className="text-red-600 text-xs font-medium">{getDiscountedPrice(item.product, item.quantity).toFixed(2)} TND</span>
+                            </div>
+                          ) : (
+                            <p className="text-primary/70 text-xs mt-1">{item.product.price.toFixed(2)} TND</p>
+                          )}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-2 bg-cream rounded-full border border-primary/10 px-1 py-0.5">
@@ -114,7 +122,7 @@ export function CartDrawer() {
                             </button>
                           </div>
                           <p className="text-primary font-serif font-bold text-sm">
-                            {(item.product.price * item.quantity).toFixed(2)} TND
+                            {(getDiscountedPrice(item.product) * item.quantity).toFixed(2)} TND
                           </p>
                         </div>
                       </div>

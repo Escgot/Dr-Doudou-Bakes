@@ -19,12 +19,18 @@ export interface Product {
   description: string;
   price: number; // in TND (Tunisian Dinar)
   image: string; // path or URL
+  galleryImages?: string[]; // Extra pictures of the product
   categoryId: string;
   badgeIds: string[];
   ingredients: string;
   dietaryNotes: string[];
   isPublished: boolean;
   createdAt: string; // ISO date
+  sortOrder?: number;
+  discountType?: 'percentage' | 'amount' | 'none';
+  discountValue?: number;
+  discountMinQuantity?: number;
+  freeDeliveryMinQuantity?: number;
 }
 
 // ── Cart ─────────────────────────────────────────────────────────────
@@ -113,6 +119,7 @@ export interface Recipe {
     FR: RecipeContent;
     AR: RecipeContent;
   };
+  sortOrder?: number;
 }
 
 // ── Dessert Gallery ──────────────────────────────────────────────────

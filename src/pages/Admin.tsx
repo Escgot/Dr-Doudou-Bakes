@@ -6,11 +6,29 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, Lock, LayoutDashboard,
   Package, Tags, Award, ShoppingBag, X, Save, ArrowLeft, BookOpen,
   Image, ArrowUp, ArrowDown, Inbox, MailOpen, MapPin,
-  Phone, StickyNote, Calendar, ChevronDown, Truck, Clock, Hash
+  Phone, StickyNote, Calendar, ChevronDown, Truck, Clock, Hash, GripVertical
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Link } from 'react-router-dom';
 import { useRecipes } from '@/context/RecipeContext';
 import { useGallery } from '@/context/GalleryContext';
+import ImageUploadField from '@/components/shared/ImageUploadField';
 
 const ADMIN_PIN = '1234';
 
@@ -141,6 +159,11 @@ function ProductForm({
   const [ingredients, setIngredients] = useState(initial?.ingredients ?? '');
   const [dietaryNotes, setDietaryNotes] = useState(initial?.dietaryNotes?.join(', ') ?? '');
   const [isPublished, setIsPublished] = useState(initial?.isPublished ?? true);
+  const [galleryImages, setGalleryImages] = useState<string[]>(initial?.galleryImages ?? []);
+  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'amount'>(initial?.discountType ?? 'none');
+  const [discountValue, setDiscountValue] = useState(initial?.discountValue?.toString() ?? '');
+  const [discountMinQuantity, setDiscountMinQuantity] = useState(initial?.discountMinQuantity?.toString() ?? '1');
+  const [freeDeliveryMinQuantity, setFreeDeliveryMinQuantity] = useState(initial?.freeDeliveryMinQuantity?.toString() ?? '');
 
   const autoSlug = (val: string) => val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -158,9 +181,13 @@ function ProductForm({
     onSave({
       name, slug, description,
       price: parseFloat(price) || 0,
-      image, categoryId, badgeIds, ingredients,
+      image, galleryImages, categoryId, badgeIds, ingredients,
       dietaryNotes: dietaryNotes.split(',').map(s => s.trim()).filter(Boolean),
       isPublished,
+      discountType,
+      discountValue: discountType !== 'none' ? (parseFloat(discountValue) || 0) : 0,
+      discountMinQuantity: discountType !== 'none' ? (parseInt(discountMinQuantity) || 1) : 1,
+      freeDeliveryMinQuantity: freeDeliveryMinQuantity ? parseInt(freeDeliveryMinQuantity) : undefined,
     });
   };
 
@@ -193,15 +220,95 @@ function ProductForm({
           </select>
         </div>
       </div>
-      <div>
-        <label className={labelClass}>Image Path / URL</label>
-        <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} placeholder="/images/desserts/example.webp" />
-        {image && (
-          <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-white/10">
-            <img src={image} alt="preview" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
+      {/* ── Discount ─────────────────────── */}
+      <div className="bg-[#0f3460]/30 p-4 rounded-xl border border-white/5 space-y-3">
+        <label className={labelClass}>Discount</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Discount Type</label>
+            <select value={discountType} onChange={e => setDiscountType(e.target.value as any)} className={inputClass}>
+              <option value="none">No Discount</option>
+              <option value="percentage">Percentage (%)</option>
+              <option value="amount">Fixed Amount (TND)</option>
+            </select>
+          </div>
+          {discountType !== 'none' && (
+            <div>
+              <label className={labelClass}>{discountType === 'percentage' ? 'Discount %' : 'Discount Amount (TND)'}</label>
+              <input type="number" step="0.01" min="0" max={discountType === 'percentage' ? '100' : undefined} value={discountValue} onChange={e => setDiscountValue(e.target.value)} className={inputClass} placeholder={discountType === 'percentage' ? 'e.g. 15' : 'e.g. 2.00'} />
+            </div>
+          )}
+        </div>
+        {discountType !== 'none' && discountValue && parseFloat(discountValue) > 0 && (
+          <div className="flex items-center gap-2 mt-2 text-sm">
+            <span className="text-gray-400 line-through">{parseFloat(price || '0').toFixed(2)} TND</span>
+            <span className="text-emerald-400 font-semibold">
+              {discountType === 'percentage'
+                ? ((parseFloat(price || '0') * (1 - parseFloat(discountValue) / 100))).toFixed(2)
+                : Math.max(0, parseFloat(price || '0') - parseFloat(discountValue)).toFixed(2)
+              } TND
+            </span>
+            <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded-full text-xs font-medium">
+              {discountType === 'percentage' ? `-${discountValue}%` : `-${parseFloat(discountValue).toFixed(2)} TND`}
+            </span>
           </div>
         )}
+        
+        {/* Additional Conditions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 border-t border-white/5 pt-3">
+          {discountType !== 'none' && (
+            <div>
+              <label className={labelClass}>Min Quantity for Discount</label>
+              <input type="number" min="1" value={discountMinQuantity} onChange={e => setDiscountMinQuantity(e.target.value)} className={inputClass} placeholder="e.g. 1" />
+              <p className="text-[10px] text-gray-400 mt-1">Leave as 1 for no minimum.</p>
+            </div>
+          )}
+          <div className={discountType === 'none' ? "md:col-span-2" : ""}>
+            <label className={labelClass}>Min Quantity for Free Delivery</label>
+            <input type="number" min="1" value={freeDeliveryMinQuantity} onChange={e => setFreeDeliveryMinQuantity(e.target.value)} className={inputClass} placeholder="e.g. 5" />
+            <p className="text-[10px] text-gray-400 mt-1">Leave empty if this product does not trigger free delivery.</p>
+          </div>
+        </div>
       </div>
+      <ImageUploadField
+        value={image}
+        onChange={setImage}
+        label="Main Product Image *"
+        folder="products"
+        placeholder="/images/desserts/example.webp"
+        required
+      />
+
+      <div className="bg-[#0f3460]/30 p-4 rounded-xl border border-white/5 space-y-4">
+        <label className={labelClass}>Additional Gallery Images</label>
+        
+        {galleryImages.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            {galleryImages.map((imgUrl, idx) => (
+              <div key={idx} className="relative group rounded-lg overflow-hidden border border-white/10 aspect-square">
+                <img src={imgUrl} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setGalleryImages(prev => prev.filter((_, i) => i !== idx))}
+                  className="absolute top-1 right-1 p-1 bg-red-500/80 hover:bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <ImageUploadField
+          value=""
+          onChange={(newUrl) => {
+            if (newUrl) setGalleryImages(prev => [...prev, newUrl]);
+          }}
+          label="Add Gallery Image"
+          folder="products/gallery"
+        />
+      </div>
+
       <div>
         <label className={labelClass}>Description *</label>
         <textarea value={description} onChange={e => setDescription(e.target.value)} className={inputClass + ' resize-none'} rows={3} required />
@@ -389,8 +496,13 @@ function RecipeForm({
           <input value={id} onChange={e => setId(e.target.value)} className={inputClass} required disabled={!!initial} placeholder="e.g. chocolate-cake" />
         </div>
         <div>
-          <label className={labelClass}>Image URL *</label>
-          <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} className={inputClass} required />
+          <ImageUploadField
+            value={imageUrl}
+            onChange={setImageUrl}
+            label="Recipe Image"
+            required
+            folder="recipes"
+          />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -548,13 +660,14 @@ function GalleryItemForm({
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Image Path / URL *</label>
-          <input value={image} onChange={e => setImage(e.target.value)} className={inputClass} required placeholder="/images/desserts/example.webp" />
-          {image && (
-            <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-white/10">
-              <img src={image} alt="preview" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
-            </div>
-          )}
+          <ImageUploadField
+            value={image}
+            onChange={setImage}
+            label="Gallery Image"
+            required
+            folder="gallery"
+            placeholder="/images/desserts/example.webp"
+          />
         </div>
         <div>
           <label className={labelClass}>Sort Order</label>
@@ -619,7 +732,120 @@ function GalleryItemForm({
   );
 }
 
+// ── Sortable Rows ──────────────────────────────────────────────────────
+
+function SortableProductRow({ product, categories, togglePublish, handleEditProduct, deleteProduct }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: product.id });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
+    zIndex: isDragging ? 10 : 1,
+  };
+
+  const cat = categories.find((c: any) => c.id === product.categoryId);
+
+  return (
+    <tr ref={setNodeRef} style={style} className={`border-b border-white/5 hover:bg-white/[0.02] transition-colors ${isDragging ? 'bg-[#1a2642]' : ''}`}>
+      <td className="px-4 py-4 w-10">
+        <button {...attributes} {...listeners} className="text-gray-500 hover:text-white cursor-grab active:cursor-grabbing p-1 rounded hover:bg-white/5">
+          <GripVertical className="w-4 h-4" />
+        </button>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+            <img src={product.image} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium">{product.name}</p>
+            <p className="text-gray-500 text-xs mt-0.5">{product.slug}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-gray-300 text-sm">{cat?.name || '—'}</span>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-white text-sm font-medium">{product.price.toFixed(2)} TND</span>
+      </td>
+      <td className="px-6 py-4">
+        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
+          product.isPublished
+            ? 'bg-emerald-500/10 text-emerald-400'
+            : 'bg-gray-500/10 text-gray-400'
+        }`}>
+          {product.isPublished ? 'Published' : 'Draft'}
+        </span>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => togglePublish(product.id)} className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5" title={product.isPublished ? 'Unpublish' : 'Publish'}>
+            {product.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+          <button onClick={() => handleEditProduct(product)} className="p-2 text-gray-400 hover:text-amber-400 transition-colors rounded-lg hover:bg-white/5" title="Edit">
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button onClick={() => { if (confirm('Delete this product?')) deleteProduct(product.id); }} className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5" title="Delete">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function SortableRecipeRow({ recipe, setEditingRecipe, setModalOpen, deleteRecipe }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: recipe.id });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: 'relative' as const,
+    zIndex: isDragging ? 10 : 1,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} className={`border-b border-white/5 hover:bg-white/[0.02] transition-colors ${isDragging ? 'bg-[#1a2642]' : ''}`}>
+      <td className="px-4 py-4 w-10">
+        <button {...attributes} {...listeners} className="text-gray-500 hover:text-white cursor-grab active:cursor-grabbing p-1 rounded hover:bg-white/5">
+          <GripVertical className="w-4 h-4" />
+        </button>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+            <img src={recipe.imageUrl} alt="" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium">{recipe.translations.EN.title}</p>
+            <p className="text-gray-500 text-xs mt-0.5">{recipe.id}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-gray-300 text-sm">{recipe.translations.EN.category}</span>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-gray-300 text-sm">{recipe.difficulty}</span>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => { setEditingRecipe(recipe); setModalOpen(true); }} className="p-2 text-gray-400 hover:text-amber-400 transition-colors rounded-lg hover:bg-white/5" title="Edit">
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button onClick={() => { if (confirm('Delete this recipe?')) deleteRecipe(recipe.id); }} className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5" title="Delete">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 // ── Main Admin Component ─────────────────────────────────────────────
+
 
 export function Admin() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -643,11 +869,38 @@ export function Admin() {
     addCategory, updateCategory, deleteCategory,
     addBadge, updateBadge, deleteBadge,
     updateOrderStatus, deleteOrder,
-    updateContactMessageStatus, deleteContactMessage,
+    updateContactMessageStatus, deleteContactMessage, updateProductsOrder,
   } = useProducts();
   
-  const { recipes, addRecipe, updateRecipe, deleteRecipe } = useRecipes();
+  const { recipes, addRecipe, updateRecipe, deleteRecipe, updateRecipesOrder } = useRecipes();
   const { galleryItems, addGalleryItem, updateGalleryItem, deleteGalleryItem, reorderGalleryItems } = useGallery();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEndProducts = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = products.findIndex((p) => p.id === active.id);
+      const newIndex = products.findIndex((p) => p.id === over.id);
+      const newOrder = arrayMove(products, oldIndex, newIndex);
+      updateProductsOrder(newOrder.map(p => p.id));
+    }
+  };
+
+  const handleDragEndRecipes = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = recipes.findIndex((r) => r.id === active.id);
+      const newIndex = recipes.findIndex((r) => r.id === over.id);
+      const newOrder = arrayMove(recipes, oldIndex, newIndex);
+      updateRecipesOrder(newOrder.map(r => r.id));
+    }
+  };
 
   if (!authenticated) return <PinGate onSuccess={() => setAuthenticated(true)} />;
 
@@ -793,65 +1046,41 @@ export function Admin() {
               </div>
               <div className="bg-[#16213e] rounded-2xl border border-white/5 overflow-hidden">
                 <div className="overflow-x-auto w-full">
-                  <table className="w-full min-w-[800px]">
-                  <thead>
-                    <tr className="border-b border-white/5">
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Product</th>
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Category</th>
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Price</th>
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Status</th>
-                      <th className="text-right text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map(product => {
-                      const cat = categories.find(c => c.id === product.categoryId);
-                      return (
-                        <tr key={product.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                                <img src={product.image} alt="" className="w-full h-full object-cover" />
-                              </div>
-                              <div>
-                                <p className="text-white text-sm font-medium">{product.name}</p>
-                                <p className="text-gray-500 text-xs mt-0.5">{product.slug}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-gray-300 text-sm">{cat?.name || '—'}</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-white text-sm font-medium">{product.price.toFixed(2)} TND</span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                              product.isPublished
-                                ? 'bg-emerald-500/10 text-emerald-400'
-                                : 'bg-gray-500/10 text-gray-400'
-                            }`}>
-                              {product.isPublished ? 'Published' : 'Draft'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-1">
-                              <button onClick={() => togglePublish(product.id)} className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5" title={product.isPublished ? 'Unpublish' : 'Publish'}>
-                                {product.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                              <button onClick={() => handleEditProduct(product)} className="p-2 text-gray-400 hover:text-amber-400 transition-colors rounded-lg hover:bg-white/5" title="Edit">
-                                <Pencil className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => { if (confirm('Delete this product?')) deleteProduct(product.id); }} className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5" title="Delete">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                  </table>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEndProducts}
+                  >
+                    <table className="w-full min-w-[800px]">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        <th className="w-10 px-4 py-4"></th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Product</th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Category</th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Price</th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Status</th>
+                        <th className="text-right text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <SortableContext
+                        items={products.map(p => p.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {products.map(product => (
+                          <SortableProductRow
+                            key={product.id}
+                            product={product}
+                            categories={categories}
+                            togglePublish={togglePublish}
+                            handleEditProduct={handleEditProduct}
+                            deleteProduct={deleteProduct}
+                          />
+                        ))}
+                      </SortableContext>
+                    </tbody>
+                    </table>
+                  </DndContext>
                 </div>
                 {products.length === 0 && (
                   <div className="text-center py-16 text-gray-500">
@@ -890,49 +1119,39 @@ export function Admin() {
               </div>
               <div className="bg-[#16213e] rounded-2xl border border-white/5 overflow-hidden">
                 <div className="overflow-x-auto w-full">
-                  <table className="w-full min-w-[600px]">
-                  <thead>
-                    <tr className="border-b border-white/5">
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Recipe</th>
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Category</th>
-                      <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Difficulty</th>
-                      <th className="text-right text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recipes.map(recipe => (
-                      <tr key={recipe.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                              <img src={recipe.imageUrl} alt="" className="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                              <p className="text-white text-sm font-medium">{recipe.translations.EN.title}</p>
-                              <p className="text-gray-500 text-xs mt-0.5">{recipe.id}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-300 text-sm">{recipe.translations.EN.category}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-300 text-sm">{recipe.difficulty}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => { setEditingRecipe(recipe); setModalOpen(true); }} className="p-2 text-gray-400 hover:text-amber-400 transition-colors rounded-lg hover:bg-white/5" title="Edit">
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => { if (confirm('Delete this recipe?')) deleteRecipe(recipe.id); }} className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg hover:bg-white/5" title="Delete">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEndRecipes}
+                  >
+                    <table className="w-full min-w-[600px]">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        <th className="w-10 px-4 py-4"></th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Recipe</th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Category</th>
+                        <th className="text-left text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Difficulty</th>
+                        <th className="text-right text-gray-400 text-xs font-medium tracking-wider px-6 py-4">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  </table>
+                    </thead>
+                    <tbody>
+                      <SortableContext
+                        items={recipes.map(r => r.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {recipes.map(recipe => (
+                          <SortableRecipeRow
+                            key={recipe.id}
+                            recipe={recipe}
+                            setEditingRecipe={setEditingRecipe}
+                            setModalOpen={setModalOpen}
+                            deleteRecipe={deleteRecipe}
+                          />
+                        ))}
+                      </SortableContext>
+                    </tbody>
+                    </table>
+                  </DndContext>
                 </div>
                 {recipes.length === 0 && (
                   <div className="text-center py-16 text-gray-500">

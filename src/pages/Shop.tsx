@@ -6,6 +6,7 @@ import { AnimatedSection } from '@/components/shared/AnimatedSection';
 import { useLanguage } from '@/context/LanguageContext';
 import { useProducts } from '@/context/ProductContext';
 import { useCart } from '@/context/CartContext';
+import { getDiscountedPrice, hasDiscount } from '@/lib/discount';
 import type { Product } from '@/types';
 
 export function Shop() {
@@ -122,6 +123,7 @@ export function Shop() {
 
                         {/* Badges */}
                         <div className="absolute top-4 left-4 flex flex-col gap-2">
+
                           {badges.map(badge => (
                             <span
                               key={badge.id}

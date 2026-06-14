@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc,
   getDocs, writeBatch,
@@ -44,6 +44,7 @@ const SEED_PRODUCTS: Product[] = [
     ingredients: 'Belgian chocolate (cocoa mass, sugar, cocoa butter, soy lecithin), butter, free-range eggs, wheat flour, vanilla extract, sea salt flakes.',
     dietaryNotes: ['Contains: Gluten, Eggs, Dairy, Soy'],
     isPublished: true,
+    galleryImages: [],
     createdAt: '2026-02-01T10:00:00Z',
   },
   {
@@ -58,6 +59,7 @@ const SEED_PRODUCTS: Product[] = [
     ingredients: 'Almonds, sugar, rose water, semolina, butter, orange blossom water, honey, powdered sugar',
     dietaryNotes: ['Contains: Tree Nuts, Dairy', 'Egg-Free'],
     isPublished: true,
+    galleryImages: [],
     createdAt: '2026-01-15T10:00:00Z',
   },
   {
@@ -72,6 +74,7 @@ const SEED_PRODUCTS: Product[] = [
     ingredients: 'Wheat flour, butter, sugar, eggs, Madagascar vanilla, cream cheese, heavy cream, fresh strawberries, white chocolate',
     dietaryNotes: ['Contains: Gluten, Eggs, Dairy'],
     isPublished: true,
+    galleryImages: [],
     createdAt: '2026-02-01T10:00:00Z',
   },
   {
@@ -86,6 +89,7 @@ const SEED_PRODUCTS: Product[] = [
     ingredients: 'Dark chocolate, butter, eggs, sugar, wheat flour, cocoa powder, vanilla extract, sea salt, walnut pieces',
     dietaryNotes: ['Contains: Gluten, Eggs, Dairy, Tree Nuts'],
     isPublished: true,
+    galleryImages: [],
     createdAt: '2026-01-20T10:00:00Z',
   },
   {
@@ -100,6 +104,7 @@ const SEED_PRODUCTS: Product[] = [
     ingredients: 'Cream cheese, sour cream, eggs, sugar, graham crackers, butter, vanilla extract, lemon zest, heavy cream',
     dietaryNotes: ['Contains: Gluten, Eggs, Dairy'],
     isPublished: true,
+    galleryImages: [],
     createdAt: '2026-01-25T10:00:00Z',
   },
 ];
@@ -188,6 +193,7 @@ interface ProductContextType {
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   togglePublish: (id: string) => void;
+  updateProductsOrder: (orderedIds: string[]) => Promise<void>;
   // CRUD — Categories
   addCategory: (category: Omit<Category, 'id'>) => void;
   updateCategory: (id: string, updates: Partial<Category>) => void;
@@ -322,7 +328,20 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   }, [contactMessages, useFirestore]);
 
   // ── Derived ──────────────────────────────────────────────────────
-  const publishedProducts = products.filter(p => p.isPublished);
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+        return a.sortOrder - b.sortOrder;
+      }
+      if (a.sortOrder !== undefined) return -1;
+      if (b.sortOrder !== undefined) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [products]);
+
+  const publishedProducts = useMemo(() => {
+    return sortedProducts.filter(p => p.isPublished);
+  }, [sortedProducts]);
 
   const getProductBySlug = useCallback(
     (slug: string) => products.find(p => p.slug === slug),
@@ -388,6 +407,27 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       );
     }
   }, [useFirestore, products]);
+
+  const updateProductsOrder = useCallback(async (orderedIds: string[]) => {
+    if (useFirestore) {
+      const batch = writeBatch(db);
+      orderedIds.forEach((id, index) => {
+        batch.update(doc(db, 'products', id), { sortOrder: index });
+      });
+      await batch.commit();
+    } else {
+      setProducts(prev => {
+        const next = [...prev];
+        orderedIds.forEach((id, index) => {
+          const productIndex = next.findIndex(p => p.id === id);
+          if (productIndex !== -1) {
+            next[productIndex] = { ...next[productIndex], sortOrder: index };
+          }
+        });
+        return next;
+      });
+    }
+  }, [useFirestore]);
 
   // ── CRUD — Categories ────────────────────────────────────────────
   const addCategory = useCallback(async (category: Omit<Category, 'id'>) => {
@@ -510,10 +550,10 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   return (
     <ProductContext.Provider
       value={{
-        products, categories, badges, orders, contactMessages,
+        products: sortedProducts, categories, badges, orders, contactMessages,
         publishedProducts, isLoading,
         getProductBySlug, getProductsByCategory, getBadgesForProduct, getCategoryById,
-        addProduct, updateProduct, deleteProduct, togglePublish,
+        addProduct, updateProduct, deleteProduct, togglePublish, updateProductsOrder,
         addCategory, updateCategory, deleteCategory,
         addBadge, updateBadge, deleteBadge,
         addOrder, updateOrderStatus, deleteOrder,

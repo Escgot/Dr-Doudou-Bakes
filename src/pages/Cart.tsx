@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, ChevronRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { getDiscountedPrice, hasDiscount } from '@/lib/discount';
 import { AnimatedSection } from '@/components/shared/AnimatedSection';
 
 export function Cart() {
@@ -84,7 +85,14 @@ export function Cart() {
                               <Link to={`/products/${item.product.slug}`} className="text-primary font-sans text-base font-semibold hover:underline">
                                 {item.product.name}
                               </Link>
-                              <span className="text-primary/70 text-sm">{item.product.price.toFixed(2)} TND</span>
+                              {hasDiscount(item.product, item.quantity) ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-muted-foreground text-xs line-through">{item.product.price.toFixed(2)} TND</span>
+                                  <span className="text-red-600 text-sm font-medium">{getDiscountedPrice(item.product, item.quantity).toFixed(2)} TND</span>
+                                </div>
+                              ) : (
+                                <span className="text-primary/70 text-sm">{item.product.price.toFixed(2)} TND</span>
+                              )}
                               <button
                                 onClick={() => removeFromCart(item.product.id)}
                                 className="text-red-400 hover:text-red-500 text-xs flex items-center gap-1 mt-2 w-fit transition-colors"
@@ -120,7 +128,7 @@ export function Cart() {
                           <div className="col-span-1 md:col-span-3 flex justify-between md:justify-end items-center">
                             <span className="md:hidden text-muted-foreground text-sm">Total</span>
                             <span className="text-primary font-serif text-lg font-bold">
-                              {(item.product.price * item.quantity).toFixed(2)} TND
+                              {(getDiscountedPrice(item.product) * item.quantity).toFixed(2)} TND
                             </span>
                           </div>
                         </div>

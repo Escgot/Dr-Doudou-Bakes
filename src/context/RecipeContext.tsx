@@ -664,6 +664,7 @@ interface RecipeContextType {
   addRecipe: (recipe: Recipe) => void;
   updateRecipe: (id: string, updates: Partial<Recipe>) => void;
   deleteRecipe: (id: string) => void;
+  updateRecipesOrder: (orderedIds: string[]) => Promise<void>;
 }
 
 const RecipeContext = createContext<RecipeContextType | undefined>(undefined);
@@ -743,8 +744,36 @@ export function RecipeProvider({ children }: { children: ReactNode }) {
     }
   }, [useFirestore]);
 
+  const updateRecipesOrder = useCallback(async (orderedIds: string[]) => {
+    if (useFirestore) {
+      const batch = writeBatch(db);
+      orderedIds.forEach((id, index) => {
+        batch.update(doc(db, 'recipes', id), { sortOrder: index });
+      });
+      await batch.commit();
+    } else {
+      setRecipes(prev => {
+        const next = [...prev];
+        orderedIds.forEach((id, index) => {
+          const recipeIndex = next.findIndex(r => r.id === id);
+          if (recipeIndex !== -1) {
+            next[recipeIndex] = { ...next[recipeIndex], sortOrder: index };
+          }
+        });
+        return next;
+      });
+    }
+  }, [useFirestore]);
+
+  const sortedRecipes = [...recipes].sort((a, b) => {
+    if (a.sortOrder !== undefined && b.sortOrder !== undefined) return a.sortOrder - b.sortOrder;
+    if (a.sortOrder !== undefined) return -1;
+    if (b.sortOrder !== undefined) return 1;
+    return 0; // Default order
+  });
+
   return (
-    <RecipeContext.Provider value={{ recipes, isLoading, addRecipe, updateRecipe, deleteRecipe }}>
+    <RecipeContext.Provider value={{ recipes: sortedRecipes, isLoading, addRecipe, updateRecipe, deleteRecipe, updateRecipesOrder }}>
       {children}
     </RecipeContext.Provider>
   );
