@@ -720,7 +720,8 @@ export function RecipeProvider({ children }: { children: ReactNode }) {
   const addRecipe = useCallback(async (recipe: Recipe) => {
     if (useFirestore) {
       const { id, ...data } = recipe;
-      await addDoc(recipesCol(), { ...data, originalId: id });
+      const cleanData = JSON.parse(JSON.stringify({ ...data, originalId: id }));
+      await addDoc(recipesCol(), cleanData);
     } else {
       setRecipes(prev => [...prev, recipe]);
     }
@@ -728,8 +729,9 @@ export function RecipeProvider({ children }: { children: ReactNode }) {
 
   const updateRecipe = useCallback(async (id: string, updates: Partial<Recipe>) => {
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = updates as Recipe;
+      const { id: _id, ...updatesWithoutId } = updates as Recipe;
       void _id;
+      const cleanUpdates = JSON.parse(JSON.stringify(updatesWithoutId));
       await updateDoc(doc(db, 'recipes', id), cleanUpdates);
     } else {
       setRecipes(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));

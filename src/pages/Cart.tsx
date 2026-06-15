@@ -85,16 +85,21 @@ export function Cart() {
                               <Link to={`/products/${item.product.slug}`} className="text-primary font-sans text-base font-semibold hover:underline">
                                 {item.product.name}
                               </Link>
-                              {hasDiscount(item.product, item.quantity) ? (
+                              {item.selectedVariant && (
+                                <p className="text-xs text-muted-foreground">
+                                  {Object.values(item.selectedVariant.options).join(' / ')}
+                                </p>
+                              )}
+                              {hasDiscount(item.product, item.quantity, item.selectedVariant) ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-muted-foreground text-xs line-through">{item.product.price.toFixed(2)} TND</span>
-                                  <span className="text-red-600 text-sm font-medium">{getDiscountedPrice(item.product, item.quantity).toFixed(2)} TND</span>
+                                  <span className="text-muted-foreground text-xs line-through">{(item.selectedVariant ? item.selectedVariant.price : item.product.price).toFixed(2)} TND</span>
+                                  <span className="text-red-600 text-sm font-medium">{getDiscountedPrice(item.product, item.quantity, item.selectedVariant).toFixed(2)} TND</span>
                                 </div>
                               ) : (
-                                <span className="text-primary/70 text-sm">{item.product.price.toFixed(2)} TND</span>
+                                <span className="text-primary/70 text-sm">{(item.selectedVariant ? item.selectedVariant.price : item.product.price).toFixed(2)} TND</span>
                               )}
                               <button
-                                onClick={() => removeFromCart(item.product.id)}
+                                onClick={() => removeFromCart(item.product.id, item.selectedVariant?.id)}
                                 className="text-red-400 hover:text-red-500 text-xs flex items-center gap-1 mt-2 w-fit transition-colors"
                               >
                                 <Trash2 className="w-3 h-3" /> Remove
@@ -107,7 +112,7 @@ export function Cart() {
                             <span className="md:hidden text-muted-foreground text-sm">Quantity</span>
                             <div className="flex items-center gap-3 bg-cream rounded-full border border-primary/10 px-2 py-1">
                               <button
-                                onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.selectedVariant?.id)}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-primary hover:bg-white transition-colors"
                               >
                                 <Minus className="w-4 h-4" />
@@ -116,7 +121,7 @@ export function Cart() {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selectedVariant?.id)}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-primary hover:bg-white transition-colors"
                               >
                                 <Plus className="w-4 h-4" />
@@ -128,7 +133,7 @@ export function Cart() {
                           <div className="col-span-1 md:col-span-3 flex justify-between md:justify-end items-center">
                             <span className="md:hidden text-muted-foreground text-sm">Total</span>
                             <span className="text-primary font-serif text-lg font-bold">
-                              {(getDiscountedPrice(item.product) * item.quantity).toFixed(2)} TND
+                              {(getDiscountedPrice(item.product, item.quantity, item.selectedVariant) * item.quantity).toFixed(2)} TND
                             </span>
                           </div>
                         </div>

@@ -259,14 +259,19 @@ export function Checkout() {
               
               <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2">
                 {items.map(item => (
-                  <div key={item.product.id} className="flex gap-4">
+                  <div key={`${item.product.id}-${item.selectedVariant?.id || 'base'}`} className="flex gap-4">
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-cream flex-shrink-0">
                       <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
                       <h4 className="text-primary text-sm font-medium line-clamp-1">{item.product.name}</h4>
+                      {item.selectedVariant && (
+                        <p className="text-muted-foreground text-[10px]">
+                          {Object.values(item.selectedVariant.options).join(' / ')}
+                        </p>
+                      )}
                       <p className="text-muted-foreground text-xs">Qty: {item.quantity}</p>
-                      <p className="text-primary/80 text-sm font-medium mt-1">{(getDiscountedPrice(item.product, item.quantity) * item.quantity).toFixed(2)} TND</p>
+                      <p className="text-primary/80 text-sm font-medium mt-1">{(getDiscountedPrice(item.product, item.quantity, item.selectedVariant) * item.quantity).toFixed(2)} TND</p>
                     </div>
                   </div>
                 ))}

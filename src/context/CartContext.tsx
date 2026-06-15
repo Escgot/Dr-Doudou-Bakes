@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { normalizeImageFields } from '@/lib/imagePaths';
 import { getDiscountedPrice } from '@/lib/discount';
-import type { CartItem, Product } from '@/types';
+import type { CartItem, Product, ProductVariant } from '@/types';
 
 // ── Storage ──────────────────────────────────────────────────────────
 
@@ -35,11 +35,11 @@ interface CartContextType {
   discount: number;
   appliedOffers: string[];
   deliveryFee: number;
-  addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number, selectedVariant?: ProductVariant) => void;
+  removeFromCart: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
-  isInCart: (productId: string) => boolean;
+  isInCart: (productId: string, variantId?: string) => boolean;
   // Delivery selection (stored here so it persists through checkout steps)
   deliveryDate: string | null;
   deliveryWindow: string | null;
@@ -77,7 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Derived
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const rawTotal = items.reduce((sum, item) => sum + getDiscountedPrice(item.product, item.quantity) * item.quantity, 0);
+  const rawTotal = items.reduce((sum, item) => sum + getDiscountedPrice(item.product, item.quantity, item.selectedVariant) * item.quantity, 0);
 
   // Promotion Engine
   let discount = 0;
@@ -87,12 +87,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Group items by category for processing (use discounted unit prices)
   const cheesecakes = items
     .filter(i => i.product.categoryId === 'cat-3')
-    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity)))
+    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity, i.selectedVariant)))
     .sort((a, b) => b - a); // Sort descending to maximize discount for user
 
   const brownies = items
     .filter(i => i.product.categoryId === 'cat-4')
-    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity)))
+    .flatMap(i => Array(i.quantity).fill(getDiscountedPrice(i.product, i.quantity, i.selectedVariant)))
     .sort((a, b) => b - a);
 
   // Cheesecake Offer Logic: 7 for 38 (Free Del), then 4 for 20
@@ -163,34 +163,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const deliveryFee = (items.length > 0 && !hasFreeDelivery && deliveryRegion) ? regionPrice : 0;
 
 
-  const addToCart = useCallback((product: Product, quantity = 1) => {
+  const addToCart = useCallback((product: Product, quantity = 1, selectedVariant?: ProductVariant) => {
     const normalizedProduct = normalizeImageFields(product);
     setItems(prev => {
-      const existing = prev.find(item => item.product.id === normalizedProduct.id);
+      const existing = prev.find(item => item.product.id === normalizedProduct.id && item.selectedVariant?.id === selectedVariant?.id);
       if (existing) {
         return prev.map(item =>
-          item.product.id === normalizedProduct.id
+          item.product.id === normalizedProduct.id && item.selectedVariant?.id === selectedVariant?.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prev, { product: normalizedProduct, quantity }];
+      return [...prev, { product: normalizedProduct, quantity, selectedVariant }];
     });
     setIsCartOpen(true);
   }, []);
 
-  const removeFromCart = useCallback((productId: string) => {
-    setItems(prev => prev.filter(item => item.product.id !== productId));
+  const removeFromCart = useCallback((productId: string, variantId?: string) => {
+    setItems(prev => prev.filter(item => !(item.product.id === productId && item.selectedVariant?.id === variantId)));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number, variantId?: string) => {
     if (quantity <= 0) {
-      setItems(prev => prev.filter(item => item.product.id !== productId));
+      setItems(prev => prev.filter(item => !(item.product.id === productId && item.selectedVariant?.id === variantId)));
       return;
     }
     setItems(prev =>
       prev.map(item =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.product.id === productId && item.selectedVariant?.id === variantId ? { ...item, quantity } : item
       )
     );
   }, []);
@@ -203,7 +203,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isInCart = useCallback(
-    (productId: string) => items.some(item => item.product.id === productId),
+    (productId: string, variantId?: string) => items.some(item => item.product.id === productId && item.selectedVariant?.id === variantId),
     [items]
   );
 

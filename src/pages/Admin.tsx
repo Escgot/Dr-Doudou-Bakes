@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProducts } from '@/context/ProductContext';
-import type { Product, Category, Badge, GalleryItem } from '@/types';
+import type { Product, Category, Badge, GalleryItem, ProductVariant } from '@/types';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Lock, LayoutDashboard,
   Package, Tags, Award, ShoppingBag, X, Save, ArrowLeft, BookOpen,
@@ -164,6 +164,8 @@ function ProductForm({
   const [discountValue, setDiscountValue] = useState(initial?.discountValue?.toString() ?? '');
   const [discountMinQuantity, setDiscountMinQuantity] = useState(initial?.discountMinQuantity?.toString() ?? '1');
   const [freeDeliveryMinQuantity, setFreeDeliveryMinQuantity] = useState(initial?.freeDeliveryMinQuantity?.toString() ?? '');
+  const [hasVariants, setHasVariants] = useState(initial?.hasVariants ?? false);
+  const [variants, setVariants] = useState<ProductVariant[]>(initial?.variants ?? []);
 
   const autoSlug = (val: string) => val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -178,12 +180,20 @@ function ProductForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name) return alert('Product Name is required');
+    if (!price) return alert('Price is required');
+    if (!categoryId) return alert('Category is required');
+    if (!image) return alert('Main Product Image is required');
+    if (!description) return alert('Description is required');
+
     onSave({
       name, slug, description,
       price: parseFloat(price) || 0,
       image, galleryImages, categoryId, badgeIds, ingredients,
       dietaryNotes: dietaryNotes.split(',').map(s => s.trim()).filter(Boolean),
       isPublished,
+      hasVariants,
+      variants: hasVariants ? variants : [],
       discountType,
       discountValue: discountType !== 'none' ? (parseFloat(discountValue) || 0) : 0,
       discountMinQuantity: discountType !== 'none' ? (parseInt(discountMinQuantity) || 1) : 1,
@@ -195,7 +205,7 @@ function ProductForm({
   const labelClass = "text-gray-300 text-xs font-medium tracking-wider mb-2 block";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Product Name *</label>
@@ -341,6 +351,78 @@ function ProductForm({
           ))}
         </div>
       </div>
+      
+      {/* ── Variants ─────────────────────── */}
+      <div className="bg-[#0f3460]/30 p-4 rounded-xl border border-white/5 space-y-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setHasVariants(!hasVariants)}
+            className={`relative w-12 h-6 rounded-full transition-colors ${hasVariants ? 'bg-amber-500' : 'bg-gray-600'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${hasVariants ? 'left-[26px]' : 'left-0.5'}`} />
+          </button>
+          <span className={labelClass + " !mb-0"}>Enable Product Variants</span>
+        </div>
+        
+        {hasVariants && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className={labelClass}>Variants</label>
+              <button
+                type="button"
+                onClick={() => setVariants(prev => [...prev, { id: `var-${Date.now()}`, options: {}, price: parseFloat(price) || 0 }])}
+                className="text-amber-400 text-xs flex items-center gap-1 hover:text-amber-300"
+              >
+                <Plus className="w-3 h-3" /> Add Variant
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {variants.map((variant, idx) => (
+                <div key={variant.id} className="bg-white/5 border border-white/10 rounded-lg p-4 relative space-y-3">
+                  <button type="button" onClick={() => setVariants(prev => prev.filter((_, i) => i !== idx))} className="absolute top-3 right-3 text-red-400 hover:text-red-300" title="Remove variant">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="grid grid-cols-2 gap-4 pr-8">
+                    <div>
+                      <label className={labelClass}>Options JSON (e.g. {`{"Size":"10cm","Type":"Vanilla"}`})</label>
+                      <input
+                        defaultValue={JSON.stringify(variant.options)}
+                        onBlur={(e) => {
+                          try {
+                            const newOptions = JSON.parse(e.target.value);
+                            setVariants(prev => prev.map((v, i) => i === idx ? { ...v, options: newOptions } : v));
+                          } catch (err) {
+                            alert('Invalid JSON for options');
+                          }
+                        }}
+                        className={inputClass + ' font-mono text-xs'}
+                        placeholder={`{"Size": "10cm"}`}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Variant Price (TND)</label>
+                      <input
+                        type="number" step="0.01"
+                        value={variant.price}
+                        onChange={e => setVariants(prev => prev.map((v, i) => i === idx ? { ...v, price: parseFloat(e.target.value) || 0 } : v))}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {variants.length === 0 && (
+                <div className="text-center py-4 bg-white/5 rounded-lg border border-dashed border-white/10 text-gray-500 text-sm">
+                  No variants added.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-3">
         <button
           type="button"

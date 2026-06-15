@@ -12,12 +12,20 @@ export interface Category {
   slug: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  options: Record<string, string>;
+  price: number;
+}
+
 export interface Product {
   id: string;
   name: string;
   slug: string;
   description: string;
   price: number; // in TND (Tunisian Dinar)
+  hasVariants?: boolean;
+  variants?: ProductVariant[];
   image: string; // path or URL
   galleryImages?: string[]; // Extra pictures of the product
   categoryId: string;
@@ -38,6 +46,7 @@ export interface Product {
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedVariant?: ProductVariant;
 }
 
 // ── Delivery ─────────────────────────────────────────────────────────

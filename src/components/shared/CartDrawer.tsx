@@ -84,29 +84,36 @@ export function CartDrawer() {
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between items-start gap-2">
-                            <h4 className="text-primary font-sans text-sm font-semibold tracking-wide line-clamp-2">
-                              {item.product.name}
-                            </h4>
+                            <div>
+                              <h4 className="text-primary font-sans text-sm font-semibold tracking-wide line-clamp-2">
+                                {item.product.name}
+                              </h4>
+                              {item.selectedVariant && (
+                                <p className="text-[10px] text-muted-foreground mt-0.5">
+                                  {Object.values(item.selectedVariant.options).join(' / ')}
+                                </p>
+                              )}
+                            </div>
                             <button
-                              onClick={() => removeFromCart(item.product.id)}
+                              onClick={() => removeFromCart(item.product.id, item.selectedVariant?.id)}
                               className="text-muted-foreground hover:text-red-500 transition-colors p-1 -mt-1 -mr-1"
                             >
                               <X className="w-4 h-4" />
                             </button>
                           </div>
-                          {hasDiscount(item.product, item.quantity) ? (
+                          {hasDiscount(item.product, item.quantity, item.selectedVariant) ? (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-muted-foreground text-[10px] line-through">{item.product.price.toFixed(2)} TND</span>
-                              <span className="text-red-600 text-xs font-medium">{getDiscountedPrice(item.product, item.quantity).toFixed(2)} TND</span>
+                              <span className="text-muted-foreground text-[10px] line-through">{(item.selectedVariant ? item.selectedVariant.price : item.product.price).toFixed(2)} TND</span>
+                              <span className="text-red-600 text-xs font-medium">{getDiscountedPrice(item.product, item.quantity, item.selectedVariant).toFixed(2)} TND</span>
                             </div>
                           ) : (
-                            <p className="text-primary/70 text-xs mt-1">{item.product.price.toFixed(2)} TND</p>
+                            <p className="text-primary/70 text-xs mt-1">{(item.selectedVariant ? item.selectedVariant.price : item.product.price).toFixed(2)} TND</p>
                           )}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-2 bg-cream rounded-full border border-primary/10 px-1 py-0.5">
                             <button
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.selectedVariant?.id)}
                               className="w-6 h-6 rounded-full flex items-center justify-center text-primary hover:bg-white transition-colors"
                             >
                               <Minus className="w-3 h-3" />
@@ -115,14 +122,14 @@ export function CartDrawer() {
                               {item.quantity}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selectedVariant?.id)}
                               className="w-6 h-6 rounded-full flex items-center justify-center text-primary hover:bg-white transition-colors"
                             >
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
                           <p className="text-primary font-serif font-bold text-sm">
-                            {(getDiscountedPrice(item.product) * item.quantity).toFixed(2)} TND
+                            {(getDiscountedPrice(item.product, item.quantity, item.selectedVariant) * item.quantity).toFixed(2)} TND
                           </p>
                         </div>
                       </div>

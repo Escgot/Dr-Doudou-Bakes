@@ -370,7 +370,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   const addProduct = useCallback(async (product: Omit<Product, 'id' | 'createdAt'>) => {
     const data = normalizeImageFields({ ...product, createdAt: new Date().toISOString() });
     if (useFirestore) {
-      await addDoc(productsCol(), data);
+      const cleanData = JSON.parse(JSON.stringify(data));
+      await addDoc(productsCol(), cleanData);
     } else {
       const id = `prod-${Date.now().toString(36)}`;
       setProducts(prev => [...prev, { ...data, id }]);
@@ -380,8 +381,11 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   const updateProduct = useCallback(async (id: string, updates: Partial<Product>) => {
     const normalizedUpdates = normalizeImageFields(updates);
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = normalizedUpdates as Product;
+      const { id: _id, ...updatesWithoutId } = normalizedUpdates as Product;
       void _id; // avoid unused warning
+      
+      const cleanUpdates = JSON.parse(JSON.stringify(updatesWithoutId));
+      
       await updateDoc(doc(db, 'products', id), cleanUpdates);
     } else {
       setProducts(prev => prev.map(p => (p.id === id ? normalizeImageFields({ ...p, ...normalizedUpdates }) : p)));
@@ -432,7 +436,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   // ── CRUD — Categories ────────────────────────────────────────────
   const addCategory = useCallback(async (category: Omit<Category, 'id'>) => {
     if (useFirestore) {
-      await addDoc(categoriesCol(), category);
+      const cleanData = JSON.parse(JSON.stringify(category));
+      await addDoc(categoriesCol(), cleanData);
     } else {
       const id = `cat-${Date.now().toString(36)}`;
       setCategories(prev => [...prev, { ...category, id }]);
@@ -441,8 +446,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   const updateCategory = useCallback(async (id: string, updates: Partial<Category>) => {
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = updates as Category;
+      const { id: _id, ...updatesWithoutId } = updates as Category;
       void _id;
+      const cleanUpdates = JSON.parse(JSON.stringify(updatesWithoutId));
       await updateDoc(doc(db, 'categories', id), cleanUpdates);
     } else {
       setCategories(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
@@ -460,7 +466,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   // ── CRUD — Badges ────────────────────────────────────────────────
   const addBadge = useCallback(async (badge: Omit<Badge, 'id'>) => {
     if (useFirestore) {
-      await addDoc(badgesCol(), badge);
+      const cleanData = JSON.parse(JSON.stringify(badge));
+      await addDoc(badgesCol(), cleanData);
     } else {
       const id = `bdg-${Date.now().toString(36)}`;
       setBadges(prev => [...prev, { ...badge, id }]);
@@ -469,8 +476,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   const updateBadge = useCallback(async (id: string, updates: Partial<Badge>) => {
     if (useFirestore) {
-      const { id: _id, ...cleanUpdates } = updates as Badge;
+      const { id: _id, ...updatesWithoutId } = updates as Badge;
       void _id;
+      const cleanUpdates = JSON.parse(JSON.stringify(updatesWithoutId));
       await updateDoc(doc(db, 'badges', id), cleanUpdates);
     } else {
       setBadges(prev => prev.map(b => (b.id === id ? { ...b, ...updates } : b)));

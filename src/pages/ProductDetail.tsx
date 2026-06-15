@@ -1,11 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Minus, Plus, ShoppingBag, Leaf, WheatOff, Wheat, Info, ArrowLeft, Egg, Milk, Nut, Bean, EggOff, Vegan } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useProducts } from '@/context/ProductContext';
 import { useCart } from '@/context/CartContext';
 import { getDiscountedPrice, hasDiscount } from '@/lib/discount';
 import { AnimatedSection } from '@/components/shared/AnimatedSection';
+import type { ProductVariant } from '@/types';
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -13,8 +14,35 @@ export function ProductDetail() {
   const { addToCart, isInCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
 
   const product = getProductBySlug(slug || '');
+
+  useEffect(() => {
+    if (product?.hasVariants && product.variants?.length) {
+      setSelectedOptions(product.variants[0].options);
+    } else {
+      setSelectedOptions({});
+    }
+  }, [product]);
+
+  const selectedVariant = product?.hasVariants && product.variants
+    ? product.variants.find(v => Object.entries(selectedOptions).every(([key, val]) => v.options[key] === val))
+    : undefined;
+
+  const currentPrice = selectedVariant ? selectedVariant.price : (product?.price || 0);
+
+  const availableOptions = useMemo(() => {
+    if (!product?.hasVariants || !product.variants) return {};
+    const options: Record<string, Set<string>> = {};
+    product.variants.forEach(v => {
+      Object.entries(v.options).forEach(([key, val]) => {
+        if (!options[key]) options[key] = new Set();
+        options[key].add(val);
+      });
+    });
+    return Object.fromEntries(Object.entries(options).map(([k, v]) => [k, Array.from(v)]));
+  }, [product]);
 
   if (!product) {
     return (
@@ -44,10 +72,14 @@ export function ProductDetail() {
       .slice(0, 4);
   }
   const ingredientsList = product.ingredients.split(',').map(i => i.trim());
-  const alreadyInCart = isInCart(product.id);
+  const alreadyInCart = isInCart(product.id, selectedVariant?.id);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    if (product.hasVariants && !selectedVariant) {
+      alert('Please select all options.');
+      return;
+    }
+    addToCart(product, quantity, selectedVariant);
     setAddedAnimation(true);
     setTimeout(() => setAddedAnimation(false), 1500);
   };
@@ -208,11 +240,11 @@ export function ProductDetail() {
               <div className="sticky top-32 space-y-8">
                 <div className="bg-white rounded-2xl p-6 shadow-lg border border-primary/5">
                   <div className="mb-6">
-                    {hasDiscount(product, quantity) ? (
+                    {hasDiscount(product, quantity, selectedVariant) ? (
                       <div>
-                        <span className="text-muted-foreground text-lg line-through mr-2">{product.price.toFixed(2)} TND</span>
+                        <span className="text-muted-foreground text-lg line-through mr-2">{currentPrice.toFixed(2)} TND</span>
                         <span className="text-red-600 font-serif text-3xl font-bold">
-                          {getDiscountedPrice(product, quantity).toFixed(2)} <span className="text-lg font-normal">TND</span>
+                          {getDiscountedPrice(product, quantity, selectedVariant).toFixed(2)} <span className="text-lg font-normal">TND</span>
                         </span>
                         <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-medium">
                           {product.discountType === 'percentage' ? `-${product.discountValue}%` : `Save ${product.discountValue?.toFixed(2)} TND`}
@@ -220,10 +252,32 @@ export function ProductDetail() {
                       </div>
                     ) : (
                       <span className="text-primary font-serif text-3xl font-bold">
-                        {product.price.toFixed(2)} <span className="text-lg font-normal">TND</span>
+                        {currentPrice.toFixed(2)} <span className="text-lg font-normal">TND</span>
                       </span>
                     )}
                   </div>
+
+                  {/* Variants */}
+                  {product.hasVariants && product.variants && Object.entries(availableOptions).map(([optionName, values]) => (
+                    <div key={optionName} className="mb-6">
+                      <label className="text-primary text-xs font-medium tracking-wider mb-3 block uppercase">{optionName}</label>
+                      <div className="flex flex-wrap gap-2">
+                        {values.map(val => (
+                          <button
+                            key={val}
+                            onClick={() => setSelectedOptions(prev => ({ ...prev, [optionName]: val }))}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                              selectedOptions[optionName] === val
+                                ? 'bg-primary text-white border-primary shadow-md'
+                                : 'bg-white/50 text-primary border-primary/20 hover:border-primary/50 hover:bg-white'
+                            }`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
 
                   {/* Quantity */}
                   <div className="mb-6">
@@ -249,7 +303,7 @@ export function ProductDetail() {
                   <div className="flex justify-between items-center py-3 border-t border-primary/10 mb-6">
                     <span className="text-muted-foreground text-sm">Subtotal</span>
                     <span className="text-primary font-serif text-lg font-bold">
-                      {(getDiscountedPrice(product, quantity) * quantity).toFixed(2)} TND
+                      {(getDiscountedPrice(product, quantity, selectedVariant) * quantity).toFixed(2)} TND
                     </span>
                   </div>
 

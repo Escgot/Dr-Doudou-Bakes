@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Calendar, Clock, MapPin, Package, ArrowRight } from 'lucide-react';
 import { useProducts } from '@/context/ProductContext';
+import { getDiscountedPrice } from '@/lib/discount';
 import type { Order } from '@/types';
 
 export function OrderConfirmation() {
@@ -131,9 +132,14 @@ export function OrderConfirmation() {
                     </div>
                     <div className="flex-1">
                       <p className="text-primary text-sm font-medium line-clamp-2">{item.product.name}</p>
+                      {item.selectedVariant && (
+                        <p className="text-muted-foreground text-[10px] mt-0.5">
+                          {Object.values(item.selectedVariant.options).join(' / ')}
+                        </p>
+                      )}
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-muted-foreground text-xs">Qty: {item.quantity}</span>
-                        <span className="text-primary text-sm font-medium">{(item.product.price * item.quantity).toFixed(2)} TND</span>
+                        <span className="text-primary text-sm font-medium">{(getDiscountedPrice(item.product, item.quantity, item.selectedVariant) * item.quantity).toFixed(2)} TND</span>
                       </div>
                     </div>
                   </div>
